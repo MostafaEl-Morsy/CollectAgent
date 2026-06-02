@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblUser>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
+        // منطق تحديد الألوان
+        var isExpired = item.SubEndDate.HasValue && item.SubEndDate < DateOnly.FromDateTime(DateTime.Today);
+        var endDateClass = isExpired ? "text-danger fw-bold" : "text-dark";
+        var statusBadgeClass = (item.IsActive == true) ? "bg-success" : "bg-danger";
+        var statusText = (item.IsActive == true) ? "مشترك" : "موقوف";
+
+        <div class="user-card" id="card-@item.Id">
+            <div class="user-card-header d-flex justify-content-between align-items-center px-3 pt-3">
+                <h5 class="user-shop-name mb-0">@item.FullName</h5>
+                <span class="badge @statusBadgeClass" id="badge-@item.Id" style="font-size: 0.8rem;">
+                    @statusText
+                </span>
+            </div>
+
+            <div class="card-body text-center pt-2">
+                <p class="mb-1 text-muted" dir="ltr"><i class="fas fa-phone ms-2"></i>@item.ContactNo</p>
+
+                @* إذا كان لديك خاصية لنظام الرصيد *@
+                @* <p class="mb-1 text-muted"><i class="fas fa-briefcase ms-2"></i>@item.TblBalanceMode?.BlncModName</p> *@
+
+                @if (item.SubEndDate.HasValue)
+                {
+                    <p class="mb-0 @endDateClass" id="date-@item.Id">
+                        <i class="far fa-calendar-times ms-2 text-muted"></i>
+                        ينتهي في: @item.SubEndDate.Value.ToString("yyyy/MM/dd")
+                    </p>
+                }
+                else
+                {
+                    <p class="mb-0 text-muted"><i class="far fa-calendar-times ms-2"></i>لا يوجد تاريخ انتهاء</p>
+                }
+            </div>
+
+            <div class="user-card-actions p-2 bg-light border-top d-flex justify-content-center">
+                <button onclick="toggleStatus(@item.Id)" class="btn btn-sm w-100 @(item.IsActive == true ? "btn-danger" : "btn-success")" id="btn-@item.Id">
+                    <i class="fas @(item.IsActive == true ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                    <span id="btn-text-@item.Id">@(item.IsActive == true ? "إيقاف الاشتراك" : "تفعيل الاشتراك")</span>
+                </button>
+            </div>
+        </div>
+    }
+}

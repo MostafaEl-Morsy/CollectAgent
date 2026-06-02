@@ -1,0 +1,203 @@
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+@model IPagedList<DatabaseAccess.Models.TblDebtTrnsAct>
+
+@{
+    ViewData["Title"] = "كشف حساب تاجر";
+    int currentAgentAccountId = ViewBag.CurrentAgentId != null ? (int)ViewBag.CurrentAgentId : 0;
+    int currentMerchantAccountId = ViewBag.CurrentMerchantAccountId != null ? (int)ViewBag.CurrentMerchantAccountId : 0;
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+
+    <!-- 1. كارت معلومات التاجر والملخص -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="card-title text-primary mb-1">
+                        <i class="fas fa-file-invoice-dollar ms-2"></i> كشف حساب: @ViewBag.MerchantName
+                    </h4>
+                    <p class="text-muted mb-0">رقم الهاتف: @ViewBag.MerchantPhone</p>
+                </div>
+                <div class="col-md-4 text-start">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">صافي الحركات (لك/عليك)</small>
+                        @{
+                            decimal balance = ViewBag.NetBalance ?? 0;
+                            string textClass = balance >= 0 ? "text-success" : "text-danger";
+                            string signTotal = balance > 0 ? "+" : "";
+                        }
+                        <h3 class="@textClass fw-bold m-0" dir="ltr">@balance.ToString("N0") @signTotal</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. عنوان القائمة -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark m-0">سجل العمليات المالية</h5>
+        <span class="badge bg-secondary">عدد العمليات: @Model.TotalItemCount</span>
+    </div>
+
+    <!-- 3. سرد الكروت -->
+    <div class="row">
+        <div class="col-12">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    // === [قاعدة البيانات الذهبية للأنواع] ===
+                    // 2, 5, 6 = وارد (موجب / أخضر)
+                    // 1, 3, 4 = صادر (سالب / أحمر)
+                    int[] incomingTypes = { 2, 5, 6 };
+                    bool isIncomingToAgent = incomingTypes.Contains(item.TransTypeId);
+
+                    // تحديد الألوان والنصوص
+                    string colorClass = isIncomingToAgent ? "text-success" : "text-danger";
+                    string sign = isIncomingToAgent ? "+" : "-";
+                    string badgeBg = isIncomingToAgent ? "bg-success" : "bg-danger";
+                    string directionText = isIncomingToAgent ? "وارد" : "صادر";
+
+                    // === [حساب مديونية التاجر حصراً] ===
+                    // نأخذ مديونية الحساب الذي لا يخص الوكيل (أي حساب التاجر)
+                    @* int? merchantDebtBefore = (item.AccidColFromFk != currentAgentAccountId) ? item.ColFrmDbtBefr : item.ColToDbtBfr; *@
+                    int? merchantDebtBefore = item.ColFrmDbtBefr;
+
+                    @* int? merchantDebtAfter = (item.AccidColFromFk != currentAgentAccountId) ? item.ColfrmDebtAfter : item.ColToDbtAftr; *@
+                    int? merchantDebtAfter = item.ColfrmDebtAfter;
+
+                    // المبالغ المطلقة تماماً لتجاهل أي إشارات سالبة من قاعدة البيانات
+                    int cashAmount = Math.Abs(item.AmntTrnsAct);
+                    int balanceAmount = Math.Abs(item.BlncTrnsAct ?? 0);
+
+                    <div class="card mb-3 shadow-sm border-0 rounded-3 border-start border-4 @(isIncomingToAgent ? "border-success" : "border-danger")">
+                        <div class="card-body p-3">
+                            <!-- الصف العلوي -->
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <div>
+                                    <span class="badge bg-light text-dark border">#@item.ReferenceCode</span>
+
+                                    <!-- شارة تحدد نوع العملية بوضوح -->
+                                    <span class="ms-2 badge @badgeBg bg-opacity-10 text-dark">
+                                        @item.TransType?.TransTypeName (@directionText)
+                                    </span>
+
+                                    <!-- إظهار اسم مزود الخدمة -->
+                                    @if (item.ProvidFkNavigation != null)
+                                    {
+                                        <span class="ms-1 badge bg-info text-dark">
+                                            <i class="fas fa-server me-1"></i> @item.ProvidFkNavigation.ProviderName
+                                        </span>
+                                    }
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="far fa-clock me-1"></i> @item.DateAndTime.ToString("yyyy/MM/dd")
+                                    <span class="mx-1">|</span>
+                                    @item.DateAndTime.ToString("hh:mm tt")
+                                </div>
+                            </div>
+
+                            <!-- الصف الأوسط -->
+                            <div class="row align-items-center text-center">
+
+                                <!-- تفاصيل المبلغ (مفصول نقدية ورصيد) -->
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="row g-0">
+                                        <!-- النقدية -->
+                                        <div class="col-6 border-end">
+                                            <small class="text-muted d-block mb-1">النقدية (كاش)</small>
+                                            @if (cashAmount == 0)
+                                            {
+                                                <h4 class="text-secondary fw-bold m-0">0</h4>
+                                            }
+                                            else
+                                            {
+                                                <h4 class="@colorClass fw-bold m-0" dir="ltr">
+                                                    @sign @cashAmount.ToString("N0")
+                                                </h4>
+                                            }
+                                        </div>
+                                        <!-- الرصيد -->
+                                        <div class="col-6">
+                                            <small class="text-muted d-block mb-1">الرصيد / الخدمات</small>
+                                            @if (balanceAmount == 0)
+                                            {
+                                                <h4 class="text-secondary fw-bold m-0">0</h4>
+                                            }
+                                            else
+                                            {
+                                                <h4 class="@colorClass fw-bold m-0" dir="ltr">
+                                                    @sign @balanceAmount.ToString("N0")
+                                                </h4>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- نوع الحركة والوصف -->
+                                <div class="col-md-4 mb-3 mb-md-0 border-start border-end">
+                                    <h6 class="fw-bold text-primary mb-1">@item.TransType?.TransTypeName</h6>
+                                    <p class="text-muted small m-0">@item.Description</p>
+                                </div>
+
+                                <!-- مديونية التاجر -->
+                                <div class="col-md-4">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="p-2 bg-light rounded">
+                                                <small class="text-muted d-block" style="font-size: 0.7rem;">مديونية التاجر قبل</small>
+                                                <span class="fw-bold text-dark">@merchantDebtBefore</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-2 bg-light rounded border border-primary border-opacity-25">
+                                                <small class="text-primary d-block" style="font-size: 0.7rem;">مديونية التاجر بعد</small>
+                                                <span class="fw-bold text-primary">@merchantDebtAfter</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- زر التفاصيل -->
+                            <div class="text-end mt-3 border-top pt-2">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                    التفاصيل الكاملة <i class="fas fa-arrow-left ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5 bg-white rounded shadow-sm">
+                    <i class="fas fa-folder-open fa-4x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-muted">لا توجد حركات مالية مسجلة مع هذا التاجر حتى الآن.</h5>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- الترقيم -->
+    @if (Model != null && Model.PageCount > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, merchantId = Context.Request.Query["merchantId"] }),
+            new PagedListRenderOptions
+            {
+                LiElementClasses = new string[] { "page-item" },
+                PageClasses = new string[] { "page-link" },
+                UlElementClasses = new string[] { "pagination pagination-lg justify-content-center" },
+                ActiveLiElementClass = "active",
+                DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                MaximumPageNumbersToDisplay = 5
+            })
+    </div>
+        }
+</div>

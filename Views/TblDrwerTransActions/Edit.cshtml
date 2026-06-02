@@ -1,0 +1,179 @@
+﻿@model DatabaseAccess.Models.TblDrwerTransAction
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TblDrwerTransAction</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="RefCode" class="control-label"></label>
+                <input asp-for="RefCode" class="form-control" />
+                <span asp-validation-for="RefCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrawerIdFk" class="control-label"></label>
+                <select asp-for="DrawerIdFk" class="form-control" asp-items="ViewBag.DrawerIdFk"></select>
+                <span asp-validation-for="DrawerIdFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own500" class="control-label"></label>
+                <input asp-for="Own500" class="form-control" />
+                <span asp-validation-for="Own500" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own200" class="control-label"></label>
+                <input asp-for="Own200" class="form-control" />
+                <span asp-validation-for="Own200" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own100" class="control-label"></label>
+                <input asp-for="Own100" class="form-control" />
+                <span asp-validation-for="Own100" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own50" class="control-label"></label>
+                <input asp-for="Own50" class="form-control" />
+                <span asp-validation-for="Own50" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own20" class="control-label"></label>
+                <input asp-for="Own20" class="form-control" />
+                <span asp-validation-for="Own20" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own10" class="control-label"></label>
+                <input asp-for="Own10" class="form-control" />
+                <span asp-validation-for="Own10" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Own5" class="control-label"></label>
+                <input asp-for="Own5" class="form-control" />
+                <span asp-validation-for="Own5" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TtlAmntOwned" class="control-label"></label>
+                <input asp-for="TtlAmntOwned" class="form-control" />
+                <span asp-validation-for="TtlAmntOwned" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le500" class="control-label"></label>
+                <input asp-for="Le500" class="form-control" />
+                <span asp-validation-for="Le500" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le200" class="control-label"></label>
+                <input asp-for="Le200" class="form-control" />
+                <span asp-validation-for="Le200" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le100" class="control-label"></label>
+                <input asp-for="Le100" class="form-control" />
+                <span asp-validation-for="Le100" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le50" class="control-label"></label>
+                <input asp-for="Le50" class="form-control" />
+                <span asp-validation-for="Le50" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le20" class="control-label"></label>
+                <input asp-for="Le20" class="form-control" />
+                <span asp-validation-for="Le20" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le10" class="control-label"></label>
+                <input asp-for="Le10" class="form-control" />
+                <span asp-validation-for="Le10" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Le5" class="control-label"></label>
+                <input asp-for="Le5" class="form-control" />
+                <span asp-validation-for="Le5" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TtlAmntTrnsAct" class="control-label"></label>
+                <input asp-for="TtlAmntTrnsAct" class="form-control" />
+                <span asp-validation-for="TtlAmntTrnsAct" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After500" class="control-label"></label>
+                <input asp-for="After500" class="form-control" />
+                <span asp-validation-for="After500" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After200" class="control-label"></label>
+                <input asp-for="After200" class="form-control" />
+                <span asp-validation-for="After200" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After100" class="control-label"></label>
+                <input asp-for="After100" class="form-control" />
+                <span asp-validation-for="After100" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After50" class="control-label"></label>
+                <input asp-for="After50" class="form-control" />
+                <span asp-validation-for="After50" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After20" class="control-label"></label>
+                <input asp-for="After20" class="form-control" />
+                <span asp-validation-for="After20" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After10" class="control-label"></label>
+                <input asp-for="After10" class="form-control" />
+                <span asp-validation-for="After10" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="After5" class="control-label"></label>
+                <input asp-for="After5" class="form-control" />
+                <span asp-validation-for="After5" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TtlAmntAfter" class="control-label"></label>
+                <input asp-for="TtlAmntAfter" class="form-control" />
+                <span asp-validation-for="TtlAmntAfter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransDate" class="control-label"></label>
+                <input asp-for="TransDate" class="form-control" />
+                <span asp-validation-for="TransDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateAndTime" class="control-label"></label>
+                <input asp-for="DateAndTime" class="form-control" />
+                <span asp-validation-for="DateAndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransTypeId" class="control-label"></label>
+                <select asp-for="TransTypeId" class="form-control" asp-items="ViewBag.TransTypeId"></select>
+                <span asp-validation-for="TransTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

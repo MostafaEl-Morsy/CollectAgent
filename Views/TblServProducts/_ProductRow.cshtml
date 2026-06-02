@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblServProduct>
+
+@foreach (var item in Model)
+{
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
+        <div class="card product-card h-100 border-0 shadow-sm">
+            <div class="card-body position-relative">
+                <!-- الخط الأزرق الجمالي في الأعلى -->
+                <div class="card-top-line"></div>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <!-- أيقونة / شعار (الجانب الأيسر) -->
+                    <div class="provider-logo">
+                        <!-- هنا نستخدم أيقونة عامة أو أول حرف من الاسم -->
+                        <div class="logo-circle">
+                            <i class="fas fa-cube fa-lg text-primary"></i>
+                        </div>
+                    </div>
+
+                    <!-- البيانات النصية (الجانب الأيمن) -->
+                    <div class="text-end">
+                        <h5 class="fw-bold mb-1 text-dark">@item.ServProdName</h5>
+                        <div class="text-muted small mb-1">
+                            <i class="fas fa-tag fa-xs"></i> @(item.CategoryFkNavigation?.ProdCatName ?? "عام")
+                        </div>
+                        <span class="badge bg-light text-dark border">@item.ServProdCode</span>
+                    </div>
+                </div>
+
+                <hr class="my-3 text-muted opacity-25" />
+
+                <!-- الحالة -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">الحالة</span>
+                    @if (item.IsActive == true)
+                    {
+                        <span class="text-success fw-bold">فعال</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger fw-bold">معطل</span>
+                    }
+                </div>
+
+                <!-- عرض السعر إذا أردت إضافته -->
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-muted small">السعر</span>
+                    <span class="text-dark fw-bold">@item.ServProdSellPrice</span>
+                </div>
+            </div>
+
+            <!-- الأزرار السفلية -->
+            <div class="card-footer bg-white border-top border-light p-0">
+                <div class="d-flex">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-link text-decoration-none w-50 border-end py-2 text-info">
+                        <i class="fas fa-info-circle"></i> تفاصيل
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-link text-decoration-none w-50 py-2 text-primary">
+                        <i class="fas fa-edit"></i> تعديل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

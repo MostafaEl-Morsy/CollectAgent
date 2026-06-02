@@ -1,0 +1,127 @@
+﻿@model DatabaseAccess.Models.TblRegistration
+
+@{
+    ViewData["Title"] = "تعديل بيانات الحساب";
+    // تحويل نوع المستخدم الحالي إلى رقم للسهولة
+    int currentUserType = ViewBag.CurrentUserType ?? 99;
+}
+
+<!-- استخدام نظام الشبكة لتوسيط النموذج -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-primary shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title">تعديل حساب POS - @Model.AccNameNo</h3>
+            </div>
+
+            <form asp-action="Edit">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="StartDate" />
+                    <input type="hidden" asp-for="ProviderFk" />
+
+                    <!-- بيانات التاجر ومزود الخدمة -->
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>التاجر</label>
+                                @if (currentUserType <= 6)
+                                {
+                                    <!-- ✅ للإدارة والوكيل: القائمة المنسدلة فقط (هي التي سترسل القيمة الجديدة) -->
+                                    <select asp-for="UserFk" class="form-control" asp-items="ViewBag.UserFkList"></select>
+                                    <span asp-validation-for="UserFk" class="text-danger"></span>
+                                    <small class="text-muted">متاح نقل الماكينة (إدارة/وكيل)</small>
+                                }
+                                else
+                                {
+                                    <!-- ✅ للمندوب: حقل نصي للعرض + حقل مخفي لإرسال القيمة القديمة كما هي -->
+                                    <input type="text" class="form-control" value="@ViewBag.Usercode" readonly disabled />
+                                    <input type="hidden" asp-for="UserFk" />
+                                }
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>مزود الخدمة</label>
+                                <input type="text" class="form-control" value="@ViewBag.ProviderName" readonly disabled />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- البيانات القابلة للتعديل -->
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="AccNameNo">اسم/رقم الحساب</label>
+                                <input asp-for="AccNameNo" class="form-control" />
+                                <span asp-validation-for="AccNameNo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="Code">الكود</label>
+                                <input asp-for="Code" class="form-control" />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- منطق عرض الرصيد الجديد -->
+                    <div class="row">
+                        @* 
+                           الشرط: 
+                           1. إذا كان المستخدم الحالي إدارة (أقل من 6)
+                           2. أو إذا كان المستخدم الحالي وكيل (يساوي 6)
+                           يسمح لهم بتعديل الرصيد
+                        *@
+                        @if (currentUserType <= 6)
+                        {
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label asp-for="Balance">الرصيد</label>
+                                    <input asp-for="Balance" class="form-control" />
+                                    <span asp-validation-for="Balance" class="text-danger"></span>
+                                    <small class="text-muted">متاح للتعديل (إدارة/وكيل)</small>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- للمندوب أو أقل، نخفي الحقل ونرسل القيمة القديمة -->
+                            <input type="hidden" asp-for="Balance" />
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>الرصيد</label>
+                                    <input value="@Model.Balance" class="form-control" readonly disabled />
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="isActiveSwitch" asp-for="IsActive">
+                            <label class="custom-control-label" for="isActiveSwitch">تفعيل الحساب</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> حفظ التعديلات
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i> العودة إلى القائمة
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

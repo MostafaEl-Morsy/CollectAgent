@@ -1,0 +1,409 @@
+﻿@model DatabaseAccess.Models.BalanceTransferAction
+@{
+    ViewBag.Title = "تحويل رصيد";
+}
+
+<style>
+    /* تصميم الترويسة العلوية لاسم التاجر */
+    .merchant-banner {
+        background: linear-gradient(135deg, #6f42c1 0%, #4b2c82 100%); /* تدرج لوني بنفسجي فخم */
+        color: white;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        border-radius: 1rem 1rem 0 0; /* حواف دائرية من الأعلى فقط */
+        position: relative;
+        overflow: hidden;
+    }
+
+        /* دوائر ديكور في الخلفية لتعطي لمسة احترافية */
+        .merchant-banner::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .merchant-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+    .merchant-icon {
+        background-color: rgba(255, 255, 255, 0.2);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+        .merchant-icon i {
+            font-size: 2.5rem;
+            color: #fff;
+        }
+
+    .merchant-name {
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        z-index: 1;
+        position: relative;
+    }
+
+    .transfer-badge {
+        background-color: #fff;
+        color: #6f42c1;
+        font-weight: bold;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        display: inline-block;
+        z-index: 1;
+        position: relative;
+    }
+
+    /* تحسين شكل البطاقة الأساسية */
+    .transfer-card {
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+</style>
+
+@* ==================================================================== *@
+@* الخطوة 1: إضافة هيكل Bootstrap Grid لتوسيط النموذج ومنع تشوهه *@
+@* ==================================================================== *@
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-7">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "transferForm" }))
+        {
+            @Html.AntiForgeryToken()
+            @* @Html.ValidationSummary(true, "", new { @class = "text-danger" }) *@
+            @* *** هذا هو التعديل ***
+       غير "true" إلى "false" لعرض أخطاء النموذج العامة بالإضافة إلى أخطاء الحقول *@
+            @* @Html.ValidationSummary(false, "", new { @class = "text-danger" }) *@
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger text-center" role="alert">
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <!-- Hidden fields -->
+            @Html.HiddenFor(model => model.ReceiverUserId)
+            @Html.HiddenFor(model => model.ReceiverDebtAfter, new { @id = "receiverDebtAfter" })
+            @Html.HiddenFor(model => model.ReceiverDebtBefore, new { @id = "receiverDebtBefore" })
+            @Html.HiddenFor(model => model.Description)
+
+            @Html.HiddenFor(model => model.dateTime, new { @id = "clientDateTime" })
+
+            <!-- البطاقة الرئيسية بشكلها الجديد -->
+            <div class="card transfer-card">
+
+                <!-- البانر الفخم لاسم التاجر -->
+                <div class="merchant-banner">
+                    <div class="merchant-icon">
+                        <i class="fas fa-store"></i> <!-- أيقونة متجر -->
+                    </div>
+                    <h2 class="merchant-name">@ViewBag.shopname</h2>
+                    <div class="transfer-badge">
+                        <i class="fas fa-exchange-alt me-1"></i> تحويل رصيد
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+
+                    @if (!string.IsNullOrEmpty(ViewBag.Error))
+                    {
+                        <div class="alert alert-danger text-center">@ViewBag.Error</div>
+                    }
+
+                    <!-- تصميم أجمل للمديونية الحالية -->
+                    <div class="alert alert-light border border-secondary border-opacity-25 rounded-3 d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-secondary bg-opacity-10 p-2 rounded-circle me-3 ms-2">
+                                <i class="fas fa-file-invoice-dollar text-secondary fs-4"></i>
+                            </div>
+                            <span class="text-muted fw-bold h6 mb-0">مديونية التاجر الحالية</span>
+                        </div>
+                        <h4 class="mb-0 text-dark fw-bolder">@Model.ReceiverDebtBefore.ToString("N2") <small class="text-muted fs-6">ج.م</small></h4>
+                    </div>
+
+                    @* ==================================================================== *@
+                    @* 2. القائمة المنسدلة لاختيار حساب المستقبل *@
+                    @* ==================================================================== *@
+                    <div class="form-group mb-4">
+                        <label asp-for="SelectedReceiverRegId" class="form-label text-muted fw-bold h6 mb-2"></label>
+                        @Html.DropDownListFor(
+                        model => model.SelectedReceiverRegId,
+                                        (SelectList)ViewBag.ReceiverRegistrations,
+                                        "-- اختر حساب المستقبل --",
+                                        new { @class = "form-select form-select-lg bg-light" }
+                                        )
+                    @Html.ValidationMessageFor(model => model.SelectedReceiverRegId, "", new { @class = "text-danger d-block mt-1" })
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="transAmnt" class="form-label text-muted fw-bold h6 mb-2">المبلغ المراد تحويله</label>
+                    <div class="input-group input-group-lg shadow-sm">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-money-bill-wave"></i></span>
+                        <input type="number" class="form-control border-start-0 text-center fw-bold fs-4 text-primary" asp-for="BlncTrnsActAmount" id="transAmnt" placeholder="0" min="1" step="1" inputmode="numeric" />
+                        <span class="input-group-text bg-light fw-bold text-muted">ج.م</span>
+                    </div>
+                    @Html.ValidationMessageFor(model => model.BlncTrnsActAmount, "", new { @class = "text-danger d-block mt-1 text-center" })
+                </div>
+
+                <!-- تصميم أجمل للمديونية بعد التحويل -->
+                <div class="alert border border-primary border-opacity-50 bg-primary bg-opacity-10 rounded-3 d-flex justify-content-between align-items-center mb-4 mt-4">
+                    <span class="text-primary fw-bold h6 mb-0">المديونية بعد التحويل</span>
+                    <h3 class="mb-0 text-primary fw-black" id="remaining-amount-display">@Model.ReceiverDebtBefore.ToString("N2") <small class="fs-6">ج.م</small></h3>
+                </div>
+
+                <div class="form-group text-center mt-5">
+                    <button type="button" class="btn btn-success btn-lg w-100 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                        <i class="fas fa-check-circle me-2"></i> تـأكيـد التحـويـل
+                    </button>
+                </div>
+            </div>
+        </div>
+                }
+
+        <div class="text-center my-3">
+            <a href="@Url.Action("Index")" class="btn btn-primary btn-oval shadow">
+                <i class="fas fa-arrow-right me-2"></i> العودة إلى القائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- 3. تحديث النوافذ المنبثقة لتتوافق مع Bootstrap 5 -->
+<!-- ==================================================================== -->
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title w-100 text-center" id="confirmationModalLabel"><i class="fas fa-question-circle me-2"></i> هل أنت متأكد؟</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p>هل أنت متأكد من تحويل مبلغ</p>
+                <h2 class="text-primary fw-bold my-2"><span id="modalAmount">0.00</span> جنيه</h2>
+                <p>إلى نقطة البيع <strong class="text-primary">@ViewBag.shopname</strong> ؟</p>
+            </div>
+            <div class="modal-footer justify-content-center border-0">
+                <button type="button" class="btn btn-secondary btn-oval" data-bs-dismiss="modal">رجوع</button>
+                <button type="button" id="confirmSubmitBtn" class="btn btn-primary btn-oval">تأكيد التحويل</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title w-100 text-center" id="errorModalLabel"><i class="fas fa-times-circle me-2"></i> خطأ</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p class="h5" id="errorModalMessage"></p>
+            </div>
+            <div class="modal-footer justify-content-center border-0">
+                <button type="button" class="btn btn-danger btn-block btn-oval" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        // ====================================================================
+        // 4. تحديث كود الجافا سكريبت بالكامل لاستخدام Bootstrap 5 API الصحيحة
+        // ====================================================================
+        document.addEventListener("DOMContentLoaded", function () {
+            // دالة تحويل الأرقام العربية : هذه الدالة ضرورية لفهم الأرقام العربية التي يكتبها المستخدم
+            function normalizeArabicNumber(str) {
+                if (!str) return '';
+                return str.toString()
+                          .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+                          .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+            }
+
+            // تهيئة نافذة الخطأ برمجياً
+            // تهيئة العناصر
+            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+            const confirmationModalEl = document.getElementById('confirmationModal');
+            const transAmntInput = document.getElementById('transAmnt');
+            const receiverDropdown = document.getElementById('SelectedReceiverRegId'); // <--- إضافة متغير القائمة المنسدلة
+
+            // نقرأ المديونية الأولية مرة واحدة فقط لأنها لا تتغير
+            const receiverDebtBefore = parseInt(document.getElementById('receiverDebtBefore').value) || 0;
+            const remainingAmountDisplay = document.getElementById('remaining-amount-display');
+            const receiverDebtAfterInput = document.getElementById('receiverDebtAfter');
+            const modalAmountSpan = document.getElementById('modalAmount');
+            const mainForm = document.getElementById('transferForm');
+            const clientDateTimeField = document.getElementById('clientDateTime');
+
+            // دالة لتنسيق العملة (لا كسور عشرية)
+            const currencyFormatter = (num) => `${(num || 0).toLocaleString('ar-EG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ج.م`;
+
+        // ====================================================================
+        // الميزات الجديدة المطلوبة (Focus, Auto-select, Clear Zero)
+        // ====================================================================
+        if(receiverDropdown) {
+            // إذا كان التاجر له حساب واحد فقط، قم باختياره تلقائياً وركز على المبلغ
+            if(receiverDropdown.options.length === 2) {
+                receiverDropdown.selectedIndex = 1;
+                // التركيز على حقل المبلغ مباشرة وتفريغ الصفر
+                transAmntInput.value = '';
+                transAmntInput.focus();
+            } else {
+                // أكثر من حساب: التركيز على القائمة المنسدلة ليختار المستخدم
+                receiverDropdown.focus();
+            }
+            // 2. التركيز التلقائي عندما يختار المستخدم حساباً يدوياً
+                receiverDropdown.addEventListener('change', function() {
+                    if(this.value !== "") { // إذا اختار حساباً فعلياً وليس الاختيار الافتراضي
+                        if (transAmntInput.value === '0') {
+                            transAmntInput.value = '';
+                        }
+                        transAmntInput.focus();
+                    }
+                });
+        }
+
+        // عند النقر (التركيز) على حقل المبلغ، إذا كان صفر قم بتفريغه
+        transAmntInput.addEventListener('focus', function() {
+            if (this.value === '0' || this.value == 0) {
+                this.value = '';
+            }
+        });
+
+        // إذا غادر المستخدم حقل المبلغ وهو فارغ، أعده إلى صفر
+        transAmntInput.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.value = '0';
+                calculateDebt();
+            }
+        });
+        // ====================================================================
+            // ====================================================================
+            // الإضافة الجديدة لمنع إرسال النموذج بمفتاح Enter
+            // ====================================================================
+            mainForm.addEventListener('keydown', function(event) {
+                // إذا كان المفتاح المضغوط هو Enter (ورمزه 13)
+                if (event.key === 'Enter' || event.keyCode === 13) {
+                    event.preventDefault(); // منع الإرسال المباشر
+
+                    // بدلاً من ذلك، نفتح نافذة التأكيد (كأننا ضغطنا على الزر بالماوس)
+                    const confirmBtn = document.querySelector('button[data-bs-target="#confirmationModal"]');
+                    if(confirmBtn) {
+                        confirmBtn.click();
+                    }
+                    return false;
+                }
+            });
+            // ====================================================================
+
+            function calculateDebt() {
+                // تجنب المشاكل إذا كان الحقل فارغاً أثناء الكتابة
+                let rawValue = transAmntInput.value === '' ? '0' : transAmntInput.value;
+                let transactAmount = parseInt(normalizeArabicNumber(rawValue)) || 0;
+
+                if (transactAmount < 0) {
+                    transactAmount = 0;
+                    transAmntInput.value = 0;
+                }
+
+                const newDebt = receiverDebtBefore + transactAmount;
+
+                // تحديث العرض للمستخدم
+                remainingAmountDisplay.textContent = currencyFormatter(newDebt);
+                // تحديث القيمة المخفية التي سترسل للخادم (رقم صحيح)
+                receiverDebtAfterInput.value = newDebt;
+                // تحديث المبلغ في نافذة التأكيد
+                modalAmountSpan.textContent = transactAmount.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // ربط الحدث الذي يشغل دالة الحساب
+            transAmntInput.addEventListener("input", calculateDebt);
+
+            // قبل فتح نافذة التأكيد، تحقق من القيمة
+            confirmationModalEl.addEventListener('show.bs.modal', function (event) {
+                const amount = parseFloat(transAmntInput.value) || 0;
+                // تحقق من اختيار الحساب
+                if(receiverDropdown && receiverDropdown.value === "") {
+                    event.preventDefault();
+                    document.getElementById('errorModalMessage').textContent = "يرجى اختيار حساب المستقبل أولاً.";
+                    errorModal.show();
+                    return;
+                }
+
+                if (amount <= 0) {
+                    // منع فتح نافذة التأكيد
+                    event.preventDefault();
+
+                    // إظهار نافذة الخطأ بدلاً منها
+                    document.getElementById('errorModalMessage').textContent = "يرجى إدخال مبلغ صحيح أكبر من الصفر للتحويل.";
+                    errorModal.show();
+                }else {
+                    // تأكد من تحديث البيانات قبل عرض النافذة
+                    calculateDebt();
+                }
+            });
+
+            // ====================================================================
+            // *** ميزة إرسال وقت المستخدم (Client Time) ***
+            // ====================================================================
+
+            document.getElementById('confirmSubmitBtn').addEventListener('click', function() {
+
+                // 1. جلب الوقت المحلي للمستخدم
+                const now = new Date();
+
+                // 2. تحويله إلى التنسيق القياسي الذي يعشقه C# (YYYY-MM-DDTHH:mm:ss)
+                // هذا يضمن أن السيرفر سيقرأ نفس الأرقام التي يراها المستخدم في ساعته بالضبط
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+
+                const clientTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+
+                // 3. وضع القيمة في الحقل المخفي وإرسال النموذج
+                clientDateTimeField.value = clientTime;
+                mainForm.submit();
+            });
+
+            // تشغيل الحساب عند تحميل الصفحة
+            calculateDebt();
+        });
+    </script>
+}

@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "قائمة مزودي الخدمة";
+}
+
+<div class="container-fluid">
+    <!-- أدوات البحث والإضافة -->
+    <div class="card mb-4 shadow-sm sticky-top" style="top: 70px; z-index: 999;">
+        <div class="card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <h4 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-building me-2"></i> مزودي الخدمة
+                    </h4>
+                </div>
+                <div class="col-md-4 my-2 my-md-0">
+                    <div class="input-group">
+                        <!-- قمت بإزالة onkeyup من هنا وسنضيفه في السكربت بطريقة أفضل -->
+                        <input type="text" id="searchInput" class="form-control" placeholder="بحث باسم المزود...">
+                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a asp-action="Create" class="btn btn-warning text-white fw-bold shadow-sm">
+                        <i class="fas fa-plus-circle me-1"></i> إضافة جديد
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- حاوية البيانات -->
+    <div class="row" id="providersContainer">
+        <!-- هنا سيتم تحميل البيانات -->
+    </div>
+
+    <!-- مؤشر التحميل -->
+    <div id="loadingSpinner" class="text-center my-4" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <p class="text-muted mt-2">جاري تحميل المزيد...</p>
+    </div>
+
+    <!-- رسالة نهاية البيانات -->
+    <div id="noMoreData" class="text-center my-4 text-muted" style="display:none;">
+        <small>-- لا توجد بيانات أخرى للعرض --</small>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let pageNumber = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        let searchTimeout; // متغير لتأخير البحث
+
+        $(document).ready(function () {
+            loadData();
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                    if (!isLoading && hasMoreData) {
+                        loadData();
+                    }
+                }
+            });
+
+            // تحسين البحث: لا يبحث إلا بعد التوقف عن الكتابة بـ نصف ثانية
+            $('#searchInput').on('keyup', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    resetAndLoad();
+                }, 500);
+            });
+        });
+
+        function resetAndLoad() {
+            pageNumber = 1;
+            hasMoreData = true;
+            $("#providersContainer").empty();
+            $("#noMoreData").hide();
+            loadData();
+        }
+
+        function loadData() {
+            let searchQuery = $("#searchInput").val();
+            isLoading = true;
+            $("#loadingSpinner").show();
+
+            $.ajax({
+                url: '@Url.Action("GetProvidersData", "TblProviders")',
+                type: 'GET',
+                data: { pageNumber: pageNumber, search: searchQuery },
+                success: function (response) {
+                    if (!response || response.trim() === "") {
+                        hasMoreData = false;
+                        $("#noMoreData").show();
+                    } else {
+                        $("#providersContainer").append(response);
+                        pageNumber++;
+                    }
+                },
+                error: function () {
+                    console.log("Error loading data");
+                },
+                complete: function () {
+                    isLoading = false;
+                    $("#loadingSpinner").hide();
+                }
+            });
+        }
+
+        function confirmDelete(id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                 // استخدام Url.Action لضمان صحة الرابط دائماً
+                 window.location.href = '@Url.Action("Delete", "TblProviders")/' + id;
+            }
+        }
+    </script>
+}
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card-outline.card-primary {
+        border-top: 3px solid #007bff;
+    }
+</style>

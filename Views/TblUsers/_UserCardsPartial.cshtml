@@ -1,0 +1,41 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblUser>
+
+@{
+    var displayMode = ViewBag.DisplayMode as string ?? "admin";
+}
+
+@foreach (var item in Model)
+{
+    <div class="user-card">
+        <div class="user-card-header">
+            @* نعرض الاسم الكامل في وضع العمليات، والكود في وضع الإدارة *@
+            <h5 class="user-shop-name">@(item.UserCode ?? item.FullName)</h5>
+            <p class="user-full-name">@item.ContactNo</p>
+
+            @* في وضع الإدارة، من المفيد عرض نوع المستخدم *@
+            @if (displayMode == "admin")
+            {
+                <span class="badge bg-secondary mt-2">@item.UserTypeFkNavigation.UserTypeName</span>
+            }
+        </div>
+
+        <div class="user-card-actions">
+            @if (displayMode == "oprate")
+            {
+                <!-- أزرار وضع العمليات -->
+                <a asp-controller="TblOrders" asp-action="BalanceTransfer" asp-route-id="@item.Id" class="btn btn-purple"><i class="fas fa-exchange-alt"></i> تحـويل</a>
+                <a asp-controller="Coll" asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary"><i class="fas fa-hand-holding-usd"></i> تحـصـيل</a>
+                <a asp-controller="TblDepositOrders" asp-action="Create" asp-route-type="3" asp-route-merchantId="@item.Id" class="btn btn-info"><i class="fas fa-dolly-flatbed"></i> تـوريد </a>
+                <a asp-controller="TblDebtTrnsActs" asp-action="Index" asp-route-merchantId="@item.Id" class="btn btn-danger"><i class="fas fa-file-invoice-dollar"></i> كشف حساب</a>
+                <a asp-controller="TblServProducts" asp-action="ServIndex" asp-route-id="@item.Id" class="btn btn-warning"><i class="fas fa-bolt"></i> شحـن خدمـات</a>
+            }
+            else
+            {
+                <!-- أزرار الوضع الإداري -->
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="تعديل"><i class="fas fa-edit"></i> تعديل</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="تفاصيل"><i class="fas fa-info-circle"></i> تفاصيل</a>
+                // <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="حذف" onclick="return confirm('هل أنت متأكد؟');"><i class="fas fa-trash-alt"></i> حذف</a>
+            }
+        </div>
+    </div>
+}

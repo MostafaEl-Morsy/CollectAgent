@@ -1,0 +1,377 @@
+﻿/* =================================================================== */
+/*  COLLECTION PAGE STYLES - ENHANCED & COMPLETE VERSION
+/* =================================================================== */
+
+:root {
+    /* ألوان رئيسية */
+    --primary-color: #6366f1; /* بنفسجي/أزرق جذاب */
+    --success-color: #10b981; /* أخضر زاهي */
+    --danger-color: #ef4444; /* أحمر واضح */
+    --dark-color: #1f2937; /* لون نص داكن */
+    --light-color: #f9fafb; /* لون خلفية فاتح جداً */
+    --border-color: #e5e7eb; /* لون حدود رمادي فاتح */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* --- General Page & Form Container --- */
+.collection-page-container {
+    max-width: 480px;
+    margin: 2rem auto;
+    padding: 0 15px;
+}
+
+.collection-form {
+    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    direction: rtl;
+    position: relative;
+}
+
+    /* شريط علوي ملون */
+    .collection-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    }
+
+.form-content {
+    padding: 24px;
+}
+
+.section-title {
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 1.2rem;
+    text-align: right;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+    /* أيقونة بجانب عنوان قسم الفئات النقدية */
+    .section-title::before {
+        content: '💰'; /* Emoji can be used as an icon */
+        margin-left: 8px;
+        font-size: 1.2rem;
+    }
+
+/* --- Debt Card (Top Section) --- */
+.debt-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+    /* نمط زخرفي في الخلفية */
+    .debt-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        transform: rotate(45deg);
+    }
+
+.debt-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 12px;
+    font-weight: 500;
+    position: relative;
+}
+
+.debt-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    position: relative;
+}
+
+.debt-input {
+    border: none;
+    background-color: transparent;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: white;
+    padding: 0;
+    width: 100%;
+    text-align: right;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.debt-value span {
+    font-size: 1.2rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-right: 12px;
+}
+
+/* --- Denominations Card --- */
+.denominations-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+/* تنسيق سطر الفئة الواحدة */
+.denomination-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 5px; /* تقليل الحشو الجانبي */
+    border-bottom: 1px solid #f0f0f0;
+    direction: rtl;
+}
+
+    .denomination-item:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        margin: 0 -20px;
+        padding: 16px 20px;
+        border-radius: 12px;
+    }
+
+    .denomination-item:last-child {
+        border-bottom: none;
+    }
+
+/* 1. جهة اليمين: تسمية الفئة (مثلاً 200 ج.م) */
+.denomination-label {
+    flex: 0 0 60px; /* عرض ثابت بسيط لضمان عدم ضغط العناصر الأخرى */
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+/* 2. المنتصف: أزرار الزائد والناقص والمدخل */
+.denomination-controls {
+    flex: 1; /* تأخذ المساحة المتبقية في المنتصف */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-stepper {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-stepper:hover {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+        transform: scale(1.1);
+    }
+
+    .btn-stepper:active {
+        transform: scale(0.95);
+    }
+
+/* تحسين شكل المدخلات لتناسب المساحات الصغيرة */
+.denomination-input {
+    width: 45px !important;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+    .denomination-input:focus {
+        border-color: var(--primary-color);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        outline: none;
+    }
+
+    .denomination-input::-webkit-outer-spin-button,
+    .denomination-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+/* 3. جهة اليسار: إجمالي الفئة (الرقم الأخضر) */
+.denomination-total {
+    flex: 0 0 85px; /* عرض كافٍ لظهور الأرقام الكبيرة (مثل 1,000 ج.م) */
+    text-align: left; /* لتظهر في أقصى اليسار */
+    color: #28a745;
+    font-weight: bold;
+    font-size: 0.95rem;
+    white-space: nowrap; /* منع انقسام السطر */
+}
+
+    .denomination-total .currency {
+        font-size: 0.9rem;
+        margin-right: 4px;
+        opacity: 0.8;
+    }
+
+/* --- Summary Card --- */
+.summary-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+    .summary-row label {
+        font-weight: 600;
+        color: var(--dark-color);
+        font-size: 1rem;
+    }
+
+.summary-value {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+    .summary-value.total {
+        color: var(--primary-color);
+    }
+
+.summary-row.final-debt {
+    border-top: 2px dashed var(--border-color);
+    margin-top: 16px;
+    padding-top: 20px;
+}
+
+.summary-value.remaining {
+    color: var(--danger-color);
+    font-size: 1.6rem;
+}
+
+/* --- Return Balance Section (Completed) --- */
+.return-balance-toggle {
+    padding: 16px 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.form-switch .form-check-input {
+    width: 50px;
+    height: 28px;
+    cursor: pointer;
+    background-color: var(--border-color);
+    border-color: var(--border-color);
+}
+
+    .form-switch .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+.balance-input {
+    margin-top: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+    .balance-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+
+/* --- Action Buttons (Completed & Enhanced) --- */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* زر التأكيد يأخذ مساحة أكبر */
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* تصميم مشترك للأزرار */
+.btn-submit, .btn-back {
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* زر تأكيد التحصيل */
+.btn-submit {
+    background: linear-gradient(45deg, var(--success-color), #14c993);
+    color: white;
+    box-shadow: 0 4px 15px -5px var(--success-color);
+}
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px -5px var(--success-color);
+    }
+
+    .btn-submit:active {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 10px -5px var(--success-color);
+    }
+
+/* زر العودة (تصميم محسن) */
+.btn-back {
+    background-color: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+    .btn-back:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px -8px var(--primary-color);
+    }
+
+    .btn-submit i, .btn-back i {
+        margin-left: 8px; /* مسافة بين الأيقونة والنص */
+    }
+
+/* تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 400px) {
+    .action-buttons {
+        grid-template-columns: 1fr; /* الأزرار تحت بعضها */
+    }
+
+    .btn-submit {
+        order: -1; /* يظهر زر التأكيد في الأعلى */
+    }
+}

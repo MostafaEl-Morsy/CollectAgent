@@ -1,0 +1,121 @@
+﻿@model DatabaseAccess.Models.TblDrawer
+
+@{
+    ViewData["Title"] = "تفاصيل الخزينة";
+
+    // تم التعديل هنا: بما أن المتغير لا يقبل Null نأخذ قيمته مباشرة
+    bool isActive = Model.IsActive;
+    string activeBadgeClass = isActive ? "bg-success" : "bg-danger";
+    string activeText = isActive ? "نشط" : "غير نشط";
+}
+
+<div class="container-fluid mt-3">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+
+            <!-- بطاقة تفاصيل الخزينة -->
+            <div class="card card-info card-outline shadow-sm">
+
+                <!-- رأس البطاقة -->
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-cash-register text-info me-2"></i>
+                        خزينة / عهدة: @Model.Code
+                    </h3>
+                    <div class="card-tools m-0">
+                        <span class="badge @activeBadgeClass fs-6 px-3 py-2">
+                            <i class="fas @(isActive ? "fa-check-circle" : "fa-times-circle") me-1"></i>
+                            @activeText
+                        </span>
+                    </div>
+                </div>
+
+                <!-- جسم البطاقة -->
+                <div class="card-body">
+
+                    <!-- إجمالي النقدية (مُبرز) -->
+                    <div class="text-center mb-4 pb-4 border-bottom">
+                        <h6 class="text-muted fw-bold mb-2">إجمالي النقدية بالخزينة</h6>
+                        <h1 class="text-success fw-bold display-5 mb-0">
+                            @((Model.TtlAmntOwned ?? 0).ToString("N0")) <span class="fs-4 text-muted">ج.م</span>
+                        </h1>
+                    </div>
+
+                    <!-- بيانات المندوب والتاريخ -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="p-3 bg-light rounded border">
+                                <p class="text-muted mb-1"><i class="fas fa-user-tie text-primary me-2"></i>صاحب العهدة (المندوب):</p>
+                                <h5 class="fw-bold mb-0">
+                                    @if (Model.UserFkNavigation != null)
+                                    {
+                                        @Model.UserFkNavigation.ContactNo
+                                        @if (!string.IsNullOrEmpty(Model.UserFkNavigation.FullName))
+                                        {
+                                            <span class="text-muted fs-6">- @Model.UserFkNavigation.FullName</span>
+                                        }
+                                    }
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <p class="text-muted mb-1"><i class="fas fa-calendar-alt text-primary me-2"></i>تاريخ بدء العهدة:</p>
+                                <h5 class="fw-bold mb-0">
+                                    @* تعديل آمن للتاريخ *@
+                                    @(Model.StartDate != null ? Model.StartDate.ToString() : "غير محدد")
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تفاصيل الفئات النقدية (الجدول) -->
+                    <h5 class="text-info mb-3 border-bottom pb-2">
+                        <i class="fas fa-money-bill-wave me-2"></i>تفاصيل الفئات النقدية
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center table-sm table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>500 ج</th>
+                                    <th>200 ج</th>
+                                    <th>100 ج</th>
+                                    <th>50 ج</th>
+                                    <th>20 ج</th>
+                                    <th>10 ج</th>
+                                    <th>5 ج</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="fs-5">
+                                    <td class="@(Model.Le500 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le500 ?? 0)</td>
+                                    <td class="@(Model.Le200 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le200 ?? 0)</td>
+                                    <td class="@(Model.Le100 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le100 ?? 0)</td>
+                                    <td class="@(Model.Le50 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le50 ?? 0)</td>
+                                    <td class="@(Model.Le20 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le20 ?? 0)</td>
+                                    <td class="@(Model.Le10 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le10 ?? 0)</td>
+                                    <td class="@(Model.Le5 > 0 ? "fw-bold text-success" : "text-muted")">@(Model.Le5 ?? 0)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <!-- تذييل البطاقة (الأزرار) -->
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary px-4">
+                            <i class="fas fa-arrow-right me-2"></i> عودة للقائمة
+                        </a>
+
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-info px-4">
+                            <i class="fas fa-edit me-2"></i> تعديل بيانات الخزينة
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

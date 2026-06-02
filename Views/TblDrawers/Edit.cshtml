@@ -1,0 +1,175 @@
+﻿@model DatabaseAccess.Models.TblDrawer
+
+@{
+    ViewData["Title"] = "تعديل بيانات الخزينة";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Card البداية -->
+            <div class="card card-outline card-warning shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="m-0 fw-bold text-warning text-end">
+                        <i class="fas fa-edit me-1"></i> تعديل بيانات الخزينة والرصيد
+                    </h5>
+                </div>
+
+                <form asp-action="Edit">
+                    <div class="card-body">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <!-- حقل مخفي لحفظ الإجمالي في قاعدة البيانات -->
+                        <input type="hidden" asp-for="TtlAmntOwned" id="HiddenTotal" />
+
+                        <!-- القسم الأول: معلومات أساسية -->
+                        <div class="row mb-4 bg-light p-3 rounded">
+                            <div class="col-12"><h6 class="text-muted border-bottom pb-2 mb-3 text-end">معلومات الحساب</h6></div>
+
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Code" class="form-label small text-muted fw-bold">كود الخزينة</label>
+                                    <input asp-for="Code" class="form-control text-center fw-bold" readonly style="background-color: #e9ecef;" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="UserFk" class="form-label small text-muted fw-bold">المستخدم / المحل</label>
+                                    <select asp-for="UserFk" class="form-select select2" asp-items="ViewBag.UserFk"></select>
+                                    <span asp-validation-for="UserFk" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="StartDate" class="form-label small text-muted fw-bold">تاريخ البدء</label>
+                                    <input asp-for="StartDate" type="date" class="form-control text-center" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- القسم الثاني: فئات النقدية -->
+                        <div class="row mb-4">
+                            <div class="col-12"><h6 class="text-muted border-bottom pb-2 mb-3 text-end">جرد الفئات النقدية (أعداد الورق)</h6></div>
+
+                            @foreach (var note in new[] { 200, 100, 50, 20, 10, 5 })
+                            {
+                                var fieldName = "Le" + note;
+                                // هذا السطر يجلب القيمة من قاعدة البيانات
+                                var dbValue = Model.GetType().GetProperty(fieldName)?.GetValue(Model) ?? 0;
+
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="input-group" dir="ltr">
+                                        <!-- حقل الادخال يظهر فيه القيمة المحفوظة dbValue -->
+                                        <!-- data-rate: لتخزين قيمة العملة للحساب -->
+                                        <input name="@fieldName" id="@fieldName"
+                                               class="form-control text-center fw-bold calc-input"
+                                               type="number" min="0"
+                                               data-rate="@note"
+                                               value="@dbValue" />
+
+                                        <span class="input-group-text bg-primary text-white fw-bold" style="min-width: 70px; justify-content:center;">@note ج</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- القسم الثالث: التفعيل والإجمالي -->
+                        <div class="row align-items-center">
+                            <!-- زر التفعيل -->
+                            <div class="col-md-6 mb-3 text-end">
+                                <div class="form-check form-switch d-inline-block" dir="rtl">
+                                    <input class="form-check-input" type="checkbox" asp-for="IsActive">
+                                    <label class="form-check-label fw-bold me-2" for="IsActive">خزينة نشطة</label>
+                                </div>
+                            </div>
+
+                            <!-- مربع الإجمالي -->
+                            <div class="col-md-6">
+                                <div class="bg-dark text-white p-3 rounded shadow d-flex justify-content-between align-items-center">
+                                    <h5 class="m-0">:إجمالي المبلغ</h5>
+                                    <h3 class="m-0 text-warning fw-bold" dir="ltr">
+                                        <span id="DisplayTotal">0</span> <small style="font-size:0.5em">ج.م</small>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer bg-white text-start border-top mt-3">
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-right me-1"></i> العودة للقائمة
+                            </a>
+                            <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                                <i class="fas fa-save me-1"></i> حفظ التعديلات
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // تفعيل Select2
+            if ($('.select2').length > 0) {
+                $('.select2').select2({ theme: 'bootstrap-5', dir: 'rtl' });
+            }
+
+            // دالة الحساب
+            function calculateTotal() {
+                let total = 0;
+
+                // التكرار على كل الحقول التي لها كلاس calc-input
+                $('.calc-input').each(function() {
+                    let count = parseInt($(this).val()) || 0; // العدد المكتوب (من الداتا بيز أو ادخال المستخدم)
+                    let rate = parseInt($(this).data('rate')); // فئة العملة (500, 200...)
+
+                    total += (count * rate);
+                });
+
+                // تحديث العرض
+                $('#DisplayTotal').text(total.toLocaleString('en-US'));
+                // تحديث الحقل المخفي ليتم إرساله للسيرفر
+                $('#HiddenTotal').val(total);
+            }
+
+            // تشغيل الحساب عند الكتابة أو التغيير
+            $('.calc-input').on('input change', function () {
+                calculateTotal();
+            });
+
+            // هام جداً: تشغيل الحساب فور فتح الصفحة لقراءة البيانات القادمة من قاعدة البيانات
+            calculateTotal();
+        });
+    </script>
+}
+
+<style>
+    .card-outline.card-warning {
+        border-top: 3px solid #ffc107;
+    }
+
+    .form-control:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .input-group-text {
+        font-size: 1rem;
+    }
+    /* جعل الأرقام واضحة */
+    .calc-input {
+        font-size: 1.1rem;
+        color: #333;
+    }
+</style>

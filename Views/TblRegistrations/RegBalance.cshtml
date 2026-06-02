@@ -1,0 +1,200 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblRegistration>
+
+@{
+    ViewBag.Title = "أرصدة نقاط البيع (POS)";
+
+    // دالة تنسيق الأرقام
+    Func<object, string> FormatNumber = (val) =>
+    {
+        if (val == null) return "0";
+        if (Decimal.TryParse(val.ToString(), out decimal number))
+        {
+            return number.ToString("N0");
+        }
+        return val.ToString();
+    };
+}
+
+<style>
+    /* إعدادات الشبكة */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px 0;
+    }
+
+    /* الكارت الأساسي */
+    .wallet-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f0f4f8;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .wallet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+    /* الشريط الملون العلوي */
+    .card-top-bar {
+        height: 6px;
+        width: 100%;
+    }
+
+    /* رأس الكارت */
+    .card-header-area {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px dashed #edf2f7;
+    }
+
+    /* حاوية اللوجو أو الحرف البديل */
+    .brand-logo-container {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 15px;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+        .brand-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #fff;
+            padding: 4px;
+        }
+
+    .brand-info {
+        flex-grow: 1;
+    }
+
+    .brand-name {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #2d3748;
+    }
+
+    .acc-number {
+        font-size: 0.85rem;
+        color: #718096;
+        margin-top: 4px;
+        display: inline-block;
+        background: #f7fafc;
+        padding: 2px 8px;
+        border-radius: 6px;
+    }
+
+    /* منطقة الرصيد */
+    .card-balance-area {
+        padding: 25px 20px;
+        text-align: center;
+        background: linear-gradient(to bottom, #ffffff, #fcfcfc);
+    }
+
+    .balance-title {
+        display: block;
+        font-size: 0.95rem;
+        color: #a0aec0;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .balance-value {
+        font-size: 2.2rem;
+        font-weight: 900;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-secondary fw-bold">أرصدة المحافظ والشركات</h3>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="dashboard-grid">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            var provider = item.ProviderFkNavigation;
+
+            // استخراج اللون من الداتا بيز، وإذا كان فارغاً نضع لون رصاصي افتراضي
+            var mainColor = !string.IsNullOrEmpty(provider?.ProvMainColor) ? provider.ProvMainColor : "#cbd5e0";
+
+            // استخراج مسار الصورة
+            var logoPath = provider?.ProviderLogo;
+
+            <div class="wallet-card">
+                <!-- الشريط الملون الديناميكي -->
+                <div class="card-top-bar" style="background-color: @mainColor;"></div>
+
+                <div class="card-header-area">
+                    <!-- اللوجو -->
+                    <div class="brand-logo-container" style="background-color: @mainColor;">
+                        @if (!string.IsNullOrEmpty(logoPath))
+                        {
+                            // ضبط المسار ليعمل مع Core
+                            string finalPath = logoPath.StartsWith("~") || logoPath.StartsWith("/") ? logoPath : "~/" + logoPath;
+
+                            // الصورة + حيلة الإخفاء إذا كانت الصورة مكسورة ليظهر الحرف بدلاً منها
+                            <img src="@Url.Content(finalPath)"
+                                 alt="@provider?.ProviderName"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+
+                            // الحرف البديل (مخفي افتراضياً)
+                            <span style="display:none;">@(provider?.ProviderName?.FirstOrDefault() ?? '?')</span>
+                        }
+                        else
+                        {
+                            // إذا لم يكن هناك مسار صورة في الداتا بيز، اعرض أول حرف من اسم الشركة
+                            <span>@(provider?.ProviderName?.FirstOrDefault() ?? '?')</span>
+                        }
+                    </div>
+
+                    <div class="brand-info">
+                        <h4 class="brand-name">@(provider?.ProviderName ?? "غير معروف")</h4>
+                        <span class="acc-number">@(string.IsNullOrEmpty(item.AccNameNo) ? "حساب عام" : item.AccNameNo)</span>
+                    </div>
+                </div>
+
+                <div class="card-balance-area">
+                    <span class="balance-title">الرصيد المتاح</span>
+                    <!-- تلوين الرقم بلون الشركة -->
+                    <span class="balance-value" style="color: @mainColor;">
+                        @FormatNumber(item.Balance)
+                    </span>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning w-100 text-center shadow-sm" style="border-radius: 15px;">
+            <i class="fa fa-info-circle fa-2x mb-3 text-warning"></i>
+            <h5>لا توجد حسابات مسجلة</h5>
+            <p>لم يتم العثور على أي أرصدة تخص هذا الحساب.</p>
+        </div>
+    }
+</div>

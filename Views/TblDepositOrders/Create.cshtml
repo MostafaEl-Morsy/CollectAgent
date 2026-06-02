@@ -1,0 +1,286 @@
+﻿@model CollectAgent.ViewModels.DepositTransAction
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">
+        <h4>خطأ فادح</h4>
+        <p>لا يمكن عرض الصفحة. الموديل المطلوب غير متوفر. يرجى الرجوع والمحاولة مرة أخرى.</p>
+    </div>
+    return; // هذا يوقف تنفيذ بقية الصفحة
+}
+
+@{
+    ViewBag.Title = "طلب إيداع جديد";
+    // تعريف متغيرات الروابط في الأعلى لتنظيف الكود
+    var homeIndexUrl = Url.Action("Index", "Home");
+    var editDrawerUrl = Url.Action("Edit", "tblDrawers", new { @id = (int)ViewBag.userDrawer }); // تم إزالة userId، يجب أن يأخذه الـ Controller من المستخدم الحالي
+    // ✅✅✅ خطوة جديدة: تحويل ViewBag إلى SelectList هنا لتجنب أي مشاكل ✅✅✅
+    var providersList = ViewBag.ProviderID as SelectList;
+    var usersList = ViewBag.DepositTo as SelectList;
+}
+
+@* رسالة الخطأ أو النجاح تظهر بشكل أفضل باستخدام تصميمات Bootstrap *@
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* نستخدم card لتغليف الفورم بالكامل لمظهر احترافي ومتناسق مع AdminLTE *@
+<div class="card card-primary shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title">@ViewBag.Title</h3>
+    </div>
+    <!-- /.card-header -->
+    <!-- form start -->
+    @using (Html.BeginForm("Create", "TblDepositOrders", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.DepositType)
+        @Html.HiddenFor(model => model.DateTimeLocal, new { id = "ClientDateTime" })
+
+        <div class="card-body">
+            <div class="row">
+                @* --- قسم معلومات الإيداع --- *@
+                <div class="col-md-6">
+                    <h4>بيانات الإيداع</h4>
+                    <hr />
+
+                    @* تظهر "الحقول البنكية" فقط في النوع 1 و 2 *@
+                    @if (Model.DepositType == 1 || Model.DepositType == 2)
+                    {
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProviderID, "الشركة المودع لها", new { @class = "form-label" })
+                            @Html.DropDownListFor(model => model.ProviderID, providersList, "-- اختر الشركة --", new { @class = "form-select", required = "required" })
+                            @Html.ValidationMessageFor(model => model.ProviderID, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.DepositAccNo, "رقم حساب الإيداع", new { @class = "form-label" })
+                            @Html.EditorFor(model => model.DepositAccNo, new { htmlAttributes = new { @class = "form-control", placeholder = "أدخل رقم الحساب أو المحفظة" } })
+                            @Html.ValidationMessageFor(model => model.DepositAccNo, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.DepositPic, "صورة الإيداع", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.DepositPic, new { type = "file", @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.DepositPic, "", new { @class = "text-danger" })
+                        </div>
+                    }
+
+                    @* يظهر "حقل المستفيد" فقط في النوع 2 و 3 *@
+                    @if (Model.DepositType == 2 || Model.DepositType == 3)
+                    {
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.DepositTo, "المستفيد", new { @class = "form-label" })
+                            @Html.DropDownListFor(model => model.DepositTo, usersList, "-- اختر المستفيد --", new { @class = "form-select", required = "required", id = "DepositToDropdown" })
+                            @Html.ValidationMessageFor(model => model.DepositTo, "", new { @class = "text-danger" })
+                        </div>
+                    }
+
+                    @* حقل التاريخ يظهر دائماً *@
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Date, "التاريخ", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                @* --- قسم تفقيط المبلغ --- *@
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4>تفقيط المبلغ</h4>
+                        <a href="@editDrawerUrl" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-pencil-alt me-1"></i> تعديل التفقيطة
+                        </a>
+                    </div>
+                    <hr />
+
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center" id="cash-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>الفئة</th>
+                                    <th>العدد المتاح</th>
+                                    <th>العدد المودع</th>
+                                    <th>الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @* نستخدم data-value لتسهيل الحساب في الجافاسكريبت *@
+                                <tr class="cash-row">
+                                    <td>200</td>
+                                    <td>@Model.Own200</td>
+                                    <td>@Html.TextBoxFor(m => m.LE200, new { @class = "form-control form-control-sm text-center cash-input", type = "number", min = "0", max = Model.Own200, data_value = "200", placeholder = "0" })</td>
+                                    <td class="subtotal">0</td>
+                                </tr>
+                                <tr class="cash-row">
+                                    <td>100</td>
+                                    <td>@Model.Own100</td>
+                                    <td>@Html.TextBoxFor(m => m.LE100, new { @class = "form-control form-control-sm text-center cash-input", type = "number", min = "0", max = Model.Own100, data_value = "100", placeholder = "0" })</td>
+                                    <td class="subtotal">0</td>
+                                </tr>
+                                <tr class="cash-row">
+                                    <td>50</td>
+                                    <td>@Model.Own50</td>
+                                    <td>@Html.TextBoxFor(m => m.LE50, new { @class = "form-control form-control-sm text-center cash-input", type = "number", min = "0", max = Model.Own50, data_value = "50", placeholder = "0" })</td>
+                                    <td class="subtotal">0</td>
+                                </tr>
+                                <tr class="cash-row">
+                                    <td>20</td>
+                                    <td>@Model.Own20</td>
+                                    <td>@Html.TextBoxFor(m => m.LE20, new { @class = "form-control form-control-sm text-center cash-input", type = "number", min = "0", max = Model.Own20, data_value = "20", placeholder = "0" })</td>
+                                    <td class="subtotal">0</td>
+                                </tr>
+                                <tr class="cash-row">
+                                    <td>10</td>
+                                    <td>@Model.Own10</td>
+                                    <td>@Html.TextBoxFor(m => m.LE10, new { @class = "form-control form-control-sm text-center cash-input", type = "number", min = "0", max = Model.Own10, data_value = "10", placeholder = "0" })</td>
+                                    <td class="subtotal">0</td>
+                                </tr>
+                                <tr class="cash-row">
+                                    <td>5</td>
+                                    <td>@Model.Own5</td>
+                                    <td>@Html.TextBoxFor(m => m.LE5, new { @class = "form-control form-control-sm text-center cash-input", type = "number", min = "0", max = Model.Own5, data_value = "5", placeholder = "0" })</td>
+                                    <td class="subtotal">0</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <th colspan="3" class="text-end pe-3">إجمالي مبلغ الإيداع</th>
+                                    <th>
+                                        @* حقل الإجمالي يجب أن يكون للقراءة فقط ويتم تحديثه بالجافاسكريبت *@
+                                        @Html.TextBoxFor(m => m.DepositAmount, new { @class = "form-control form-control-sm text-center fw-bold", id = "TotalAmount", @readonly = "readonly" })
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer text-start">
+            @if (Model.TtlAmntOwned > 0)
+            {
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-upload me-2"></i> رفع طلب الإيداع
+                </button>
+            }
+            <a href="@homeIndexUrl" class="btn btn-secondary">
+                <i class="fas fa-times me-2"></i> إلغاء
+            </a>
+        </div>
+    }
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            var $depositToDropdown = $('#DepositToDropdown');
+
+            // نتحقق أولاً هل القائمة موجودة في الصفحة (لأنها لا تظهر في نوع الإيداع 1)
+            if ($depositToDropdown.length > 0) {
+
+                // 1. التركيز (Focus) على القائمة فور فتح الصفحة
+                $depositToDropdown.focus();
+
+                // 2. التحقق من عدد الخيارات
+                // إذا كان العدد 2 (الخيار الافتراضي "-- اختر --" + حساب واحد فقط)
+                if ($depositToDropdown.find('option').length === 2) {
+
+                    // اختار الحساب الوحيد تلقائياً (الاندكس 1)
+                    $depositToDropdown.prop('selectedIndex', 1);
+
+                    // إطلاق حدث التغيير لتحديث أي أكواد أخرى معتمدة عليه
+                    $depositToDropdown.trigger('change');
+                }
+             }
+            // دالة لحساب الإجمالي وتحديث الحقول
+            // دالة لحساب الإجمالي وتحديث الحقول (الكود الأصلي الخاص بك)
+            function calculateTotal() {
+                let grandTotal = 0;
+
+                // المرور على كل صف من صفوف الجدول
+                $('#cash-table .cash-row').each(function () {
+                    const row = $(this);
+                    const input = row.find('.cash-input');
+                    const denomination = parseFloat(input.data('value')); // القيمة من data-value
+                    const count = parseInt(input.val()) || 0; // العدد المدخل أو صفر
+
+                    const subtotal = denomination * count;
+                    grandTotal += subtotal;
+
+                    // تحديث حقل الإجمالي الفرعي في نفس الصف
+                    row.find('.subtotal').text(subtotal.toLocaleString('ar-EG'));
+                });
+
+                // تحديث حقل الإجمالي الكلي
+                $('#TotalAmount').val(grandTotal);
+            }
+
+                    // جلب التاريخ والوقت من متصفح المستخدم
+        var now = new Date();
+
+        // تحويله إلى صيغة يمكن إرسالها للـ ASP.NET
+        var formatted =
+            now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, '0') + "-" +
+            String(now.getDate()).padStart(2, '0') + "T" +
+            String(now.getHours()).padStart(2, '0') + ":" +
+            String(now.getMinutes()).padStart(2, '0') + ":" +
+            String(now.getSeconds()).padStart(2, '0');
+
+        $("#ClientDateTime").val(formatted);
+
+            // ربط الحدث 'input' بكل حقول الإدخال
+            // حدث 'input' أفضل من 'keyup' لأنه يستجيب لأي تغيير (كتابة، لصق، تغيير بالأسهم)
+            $('.cash-input').on('input', function() {
+                // التأكد من أن القيمة المدخلة لا تتجاوز الحد الأقصى
+                const max = parseInt($(this).attr('max')) || 0;
+                let value = parseInt($(this).val()) || 0;
+
+                if (value > max) {
+                    $(this).val(max);
+                }
+                if (value < 0) {
+                    $(this).val(0);
+                }
+
+                calculateTotal();
+            });
+
+            // حساب الإجمالي عند تحميل الصفحة لأول مرة (في حال وجود قيم افتراضية)
+            calculateTotal();
+        });
+    </script>
+
+    @* يمكن إضافة هذا الـ CSS الصغير لتحسين شكل حقول الإدخال داخل الجدول *@
+    <style>
+        .cash-input {
+            max-width: 100px;
+            margin: auto;
+        }
+
+        /* لإخفاء أسهم الزيادة والنقصان في حقول الأرقام لمظهر أنظف */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+}

@@ -1,0 +1,102 @@
+﻿@using X.PagedList.Mvc.Core
+@using X.PagedList
+@model IPagedList<DatabaseAccess.Models.TblDebtTrnsAct>
+
+@{
+    ViewBag.Title = "كشـف الحسـاب";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">سجل العمليات</h4>
+        <div class="search-box col-md-5 col-lg-4 p-0">
+            <input type="text" id="search" name="search" placeholder="بحث شامل..." class="form-control" value="@ViewBag.SearchTerm" />
+            <i class="fa fa-search"></i>
+        </div>
+    </div>
+    <div class="card-body p-2 p-md-3">
+        <!-- حاوية العمليات -->
+        <div id="transactions-list" data-page="1">
+            @Html.Partial("_TransactionsList", Model)
+        </div>
+
+        <!-- مؤشر التحميل لـ Infinite Scroll -->
+        <div id="loading-indicator" style="display:none;" class="text-center p-4">
+            <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            let isLoading = false;
+            let hasMoreData = @(Model.HasNextPage.ToString().ToLower());
+            const transactionsList = $("#transactions-list");
+            const loadingIndicator = $("#loading-indicator");
+
+            function debounce(func, delay) {
+                let timeout;
+                return function (...args) {
+                    const context = this;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // --- دالة جلب البيانات ---
+            function loadTransactions(isNewSearch = false) {
+                if (isLoading || (!hasMoreData && !isNewSearch)) {
+                    return;
+                }
+                isLoading = true;
+                loadingIndicator.show();
+
+                let pageToLoad = isNewSearch ? 1 : parseInt(transactionsList.data("page")) + 1;
+                var searchTerm = $("#search").val();
+                var url = '@Url.Action("BalanceSheet", "TblDebtTrnsActs")?search=' + encodeURIComponent(searchTerm) + '&page=' + pageToLoad;
+
+                $.get(url, function (data) {
+                    if (isNewSearch) {
+                        transactionsList.html(data); // استبدال المحتوى عند البحث
+                    } else {
+                        transactionsList.append(data); // إضافة المحتوى عند التمرير
+                    }
+
+                    // تحديث حالة "هل يوجد المزيد" بناءً على ما إذا كانت البيانات المستلمة فارغة
+                    if ($.trim(data).length == 0) {
+                        hasMoreData = false;
+                    } else {
+                        hasMoreData = true; // نفترض أن هناك المزيد طالما أننا تلقينا بيانات
+                    }
+
+                    transactionsList.data("page", pageToLoad);
+                }).fail(function() {
+                    // يمكنك إضافة رسالة خطأ هنا
+                    console.error("Failed to load transactions.");
+                    hasMoreData = false; // إيقاف المحاولات المستقبلية عند حدوث خطأ
+                }).always(function() {
+                    isLoading = false;
+                    loadingIndicator.hide();
+                });
+            }
+
+            // --- البحث ---
+            $("#search").on("keyup", debounce(function() {
+                // عند البحث، أعد تعيين كل شيء
+                transactionsList.data("page", 0);
+                hasMoreData = true; // السماح ببدء طلب جديد
+                loadTransactions(true);
+            }, 500));
+
+
+            // --- التحميل عند التمرير (Infinite Scroll) ---
+            $(window).on('scroll', function () {
+                // تحقق إذا وصل المستخدم إلى نهاية الصفحة تقريباً
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 250) {
+                    loadTransactions(false);
+                }
+            });
+        });
+    </script>
+}

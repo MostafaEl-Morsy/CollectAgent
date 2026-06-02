@@ -1,0 +1,291 @@
+﻿@model CollectAgent.ViewModels.AddUserViewModel
+
+@{
+    ViewData["Title"] = "تعديل بيانات المستخدم";
+    int userType = ViewBag.CurrentUserType;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-primary shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title">تعديل بيانات: @Model.FullName</h3>
+            </div>
+            <form asp-action="Edit">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" /> @* <-- تأكد من وجود هذا الحقل دائماً *@
+                    <input type="hidden" asp-for="ApprvDate" />
+                    @* هذا الحقل ضروري لتحديد المستخدم الذي يتم تعديله *@
+                    @* تم إزالة حقول Password و ConfirmPassword المخفية من هنا، لأنها لا تُستخدم في نموذج التعديل حالياً. *@
+                    @* تم إزالة SubEndDate المخفي لأنه يتم تعيينه في GET ولا يجب أن يُخفى في POST.*@
+
+                    <h4>1. البيانات الشخصية</h4>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                الاسم التجاري
+                                <input asp-for="Code" class="form-control" placeholder="إسم المحل إن وجد" />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="FullName"></label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ContactNo"></label>
+                                <input asp-for="ContactNo" class="form-control" />
+                                <span asp-validation-for="ContactNo" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Address"></label>
+                                <input asp-for="Address" class="form-control" />
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Governate_FK"></label>
+                                <select asp-for="Governate_FK" class="form-control" asp-items="ViewBag.GovernateFk"></select>
+                                <span asp-validation-for="Governate_FK" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Distrect_FK"></label>
+                                <select asp-for="Distrect_FK" class="form-control" asp-items="ViewBag.DistrectFk"></select>
+                                <span asp-validation-for="Distrect_FK" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Street"></label>
+                                <input asp-for="Street" class="form-control" />
+                                <span asp-validation-for="Street" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (userType < 7)  // هذا الشرط يضم المستخدمين الأقل من 7 (الإدارة، الوكلاء، التجار)
+                    {
+                        @* <input type="hidden" asp-for="SubEndDate" /> *@
+                        <h4 class="mt-4">2. بيانات الدخول والصلاحيات</h4>
+                        <hr />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="UserName"></label>
+                                    <input asp-for="UserName" class="form-control" value="" placeholder="اتركه فارغاً لعدم التغيير" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="UserTypeFk"></label>
+                                    @* <select asp-for="UserTypeFk" asp-items="Model.UserTypes" class="form-control"></select> *@
+                                    @* <span asp-validation-for="UserTypeFk" class="text-danger"></span> *@
+                                    @* ✅ التعديل: إزالة شرط disabled للوكيل (6) *@
+                                    @* كان: @(userType >= 6 ? "disabled" : "") *@
+                                    @* أصبح: @(userType > 6 ? "disabled" : "") يسمح للوكيل بالتعديل *@
+                                    @* تم إصلاح الخاصية هنا: إذا كان userType أكبر من 6 سيتم إضافة disabled تلقائياً *@
+                                    <select asp-for="UserTypeFk" class="form-control"
+                                            asp-items="ViewBag.UserTypeFk"
+                                            disabled="@(userType > 6)"></select>
+                                    <span asp-validation-for="UserTypeFk" class="text-danger"></span>
+
+                                    @* إضافة حقل مخفي لضمان إرسال القيمة في حال كان الحقل disabled لأن المتصفح لا يرسل قيم الـ disabled *@
+                                </div>
+                            </div>
+                            @* ✅ إضافة جديدة: قائمة مسئول الحساب (تظهر للوكيل فقط لتغيير مكان التاجر) *@
+                            @if (userType == 6)
+                            {
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Representative"></label> @* تأكد أن الاسم في الـ View model هو Representative *@
+                                        <select asp-for="Representative" class="form-control" asp-items="ViewBag.Representative"></select>
+                                        <span asp-validation-for="Representative" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Indebtedness"></label>
+                                    <input asp-for="Indebtedness" class="form-control" />
+                                    <span asp-validation-for="Indebtedness" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AllwdCrdtLmt"></label> <!-- حقل جديد -->
+                                    <input asp-for="AllwdCrdtLmt" class="form-control" />
+                                    <span asp-validation-for="AllwdCrdtLmt" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @* ✅ المكان الصحيح لحقل تاريخ انتهاء الاشتراك (فقط إذا كان userType < 6) *@
+                    @if (userType < 6)
+                    {
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="SubEndDate"></label>
+                                <input asp-for="SubEndDate" class="form-control" type="date" value="@Model.SubEndDate.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="SubEndDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <h4 class="mt-4">3. بيانات الشركة و الفرع</h4>
+                        <hr />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CompanyFk"></label>
+                                    <select asp-for="CompanyFk" class="form-control" asp-items="ViewBag.CompanyFk"></select>
+                                    <span asp-validation-for="CompanyFk" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="BranchFk"></label>
+                                    <select asp-for="BranchFk" class="form-control" asp-items="ViewBag.BranchFk"></select>
+                                    <span asp-validation-for="BranchFk" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="form-group form-check mt-3">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label"></label>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+                    <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ... كود الـ JavaScript الذي أضفته في الأعلى يوضع هنا ... *@
+
+@* لا حاجة لحذف هذا القسم، فهو يضيف السكربتات اللازمة للتحقق من صحة الإدخال *@
+@* ضع هذا الكود في نهاية ملف Edit.cshtml *@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            var governateDropdown = $('#Governate_FK');
+            var districtDropdown = $('#Distrect_FK');
+            var initialDistrictId = @Html.Raw(Json.Serialize(Model.Distrect_FK)); // قم بتمرير ID المنطقة الحالي بشكل آمن
+
+            function updateDistricts(initialLoad = false) {
+                var selectedGovernateId = governateDropdown.val();
+
+                districtDropdown.html('<option>جار التحميل...</option>').prop('disabled', true);
+
+                if (selectedGovernateId) {
+                    $.ajax({
+                        url: '@Url.Action("GetDistrictsByGovernateId", "TblUsers")',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { governateId: selectedGovernateId },
+                        success: function (districts) {
+                            districtDropdown.empty().prop('disabled', false);
+
+                            if (districts.length > 0) {
+                                districtDropdown.append($('<option>', {
+                                    value: '',
+                                    text: '--- اختر المنطقة ---'
+                                }));
+                                $.each(districts, function (i, district) {
+                                    var option = $('<option>', {
+                                        value: district.value,
+                                        text: district.text
+                                    });
+                                    // إذا كان التحميل الأولي وكانت المنطقة مطابقة للمنطقة الحالية للمستخدم
+                                    if (initialLoad && district.value == initialDistrictId) {
+                                        option.attr('selected', 'selected');
+                                    }
+                                    districtDropdown.append(option);
+                                });
+                            } else {
+                                districtDropdown.append($('<option>', {
+                                    value: '',
+                                    text: 'لا توجد مناطق متاحة'
+                                }));
+                            }
+                        },
+                        error: function () {
+                            alert('حدث خطأ أثناء تحميل المناطق.');
+                            districtDropdown.html('<option value="">فشل التحميل</option>').prop('disabled', true);
+                        }
+                    });
+                } else {
+                    districtDropdown.empty().append($('<option>', {
+                        value: '',
+                        text: '--- اختر محافظة أولاً ---'
+                    })).prop('disabled', true);
+                }
+            }
+
+            governateDropdown.on('change', function () {
+                updateDistricts(false);
+            });
+
+            // استدعاء updateDistricts عند تحميل الصفحة لأول مرة
+            // هذا سيضمن ملء المناطق الصحيحة عند فتح صفحة التعديل
+            updateDistricts(true);
+
+             // == فروع الشركات ==
+            var companyDropdown = $('#CompanyFk'); // ID لقائمة الشركات
+            var branchDropdown = $('#BranchFk');   // ID لقائمة الفروع
+            var initialBranchId = @Html.Raw(Json.Serialize(Model.BranchFk)); // قم بتمرير ID الفرع الحالي بشكل آمن
+
+            function updateBranches(initialLoad = false) {
+                var selectedCompanyId = companyDropdown.val();
+                branchDropdown.html('<option>جار التحميل...</option>').prop('disabled', true);
+
+                if (selectedCompanyId) {
+                    $.ajax({
+                        url: '@Url.Action("GetBranchesByCompanyId", "TblUsers")', // تأكد من وجود هذه الدالة في الكنترولر
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { companyId: selectedCompanyId },
+                        success: function (branches) {
+                            branchDropdown.empty().prop('disabled', false);
+                            if (branches.length > 0) {
+                                branchDropdown.append($('<option>', { value: '', text: '--- اختر الفرع ---' }));
+                                $.each(branches, function (i, branch) {
+                                    var option = $('<option>', { value: branch.value, text: branch.text });
+                                    if (initialLoad && branch.value == initialBranchId) {
+                                        option.attr('selected', 'selected');
+                                    }
+                                    branchDropdown.append(option);
+                                });
+                            } else {
+                                branchDropdown.append($('<option>', { value: '', text: 'لا توجد فروع متاحة' }));
+                            }
+                        },
+                        error: function () {
+                            alert('حدث خطأ أثناء تحميل الفروع.');
+                            branchDropdown.html('<option value="">فشل التحميل</option>').prop('disabled', true);
+                        }
+                    });
+                } else {
+                    branchDropdown.empty().append($('<option>', { value: '', text: '--- اختر شركة أولاً ---' })).prop('disabled', true);
+                }
+            }
+
+            companyDropdown.on('change', function () {
+                updateBranches(false);
+            });
+            updateBranches(true); // استدعاء عند تحميل الصفحة لملء الفروع بشكل صحيح
+        });
+    </script>
+}

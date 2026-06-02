@@ -1,0 +1,91 @@
+﻿@model CashBalanceViewModel
+
+@{
+    ViewBag.Title = "محافظ الكاش والخدمات";
+    Func<decimal?, string> FormatNumber = (val) => val?.ToString("N0") ?? "0";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/custom-style.css" />
+    <style>
+        /* تنسيق إضافي لضمان ظهور الكروت بشكل جيد */
+        .provider-box {
+            background-color: var(--main-color);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.2s;
+            display: flex; /* جعل المحتوى بجانب بعضه */
+            align-items: center;
+        }
+
+            .provider-box:hover {
+                transform: translateY(-3px);
+                color: white;
+            }
+    </style>
+}
+
+@if (Model.CurrentUserType < 7)
+{
+    <div class="mb-4">
+        <a href="@Url.Action("Index", "TblServProvRegs")" class="btn btn-warning shadow-sm fw-bold">
+            <i class="fas fa-wallet me-2"></i> إدارة محافظ الكاش
+        </a>
+    </div>
+}
+
+<div class="d-grid gap-3">
+    @foreach (var item in Model.Wallets)
+    {
+        var actionUrl = Url.Action("PreCreate", "TblServTrnxes", new
+        {
+            senderID = Model.CurrentUserId,
+            providerID = item.ServProvFk,
+            prodRegID = item.Id,
+            merchantId = Model.MerchantId
+        });
+
+        // تحديد اللون الافتراضي
+        var boxColor = item.ServProvFkNavigation.ProvMainColor ?? "#6a11cb";
+
+        <a href="@actionUrl" class="provider-box text-decoration-none shadow-sm" style="--main-color: @boxColor;">
+
+            @* ✅✅✅ بداية تعديل كود الصورة ✅✅✅ *@
+            <div class="provider-logo flex-shrink-0 ms-3" style="background: white; border-radius: 10px; padding: 5px; display: flex; justify-content: center; align-items: center; width: 60px; height: 60px;">
+                @{
+                    var imgPath = item.ServProvFkNavigation.ProviderLogo;
+                    if (!string.IsNullOrEmpty(imgPath))
+                    {
+                        // تنظيف المسار لضمان عمله بشكل صحيح
+                        imgPath = "/" + imgPath.Replace("~", "").TrimStart('/');
+                    }
+                }
+
+                @if (!string.IsNullOrEmpty(imgPath))
+                {
+                    <img src="@Url.Content(imgPath)"
+                         alt="@item.ServProvFkNavigation.ProviderName"
+                         style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                         onerror="this.onerror=null; this.src='/lib/adminlte/assets/img/avatar.png';" />
+                }
+                else
+                {
+                    // أيقونة بديلة في حال عدم وجود صورة
+                    <i class="fas fa-university fa-lg text-secondary"></i>
+                }
+            </div>
+            @* ✅✅✅ نهاية تعديل كود الصورة ✅✅✅ *@
+
+            <div class="provider-title flex-grow-1">
+                <h4 class="m-0 fw-bold">@item.ServProvFkNavigation.ProviderName</h4>
+                <small class="opacity-75" style="direction: ltr; display: inline-block;">@item.ServNo</small>
+            </div>
+
+            <div class="text-center ps-3 border-end border-white border-opacity-25" style="min-width: 100px;">
+                <div class="fs-4 fw-bold">@FormatNumber(item.Balance)</div>
+                <small class="opacity-75">الرصيد</small>
+            </div>
+        </a>
+    }
+</div>

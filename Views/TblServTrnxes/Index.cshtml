@@ -1,0 +1,120 @@
+﻿@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<DatabaseAccess.Models.TblServTrnx>
+
+@{
+    ViewData["Title"] = "سجل العمليات";
+}
+
+@section Styles {
+    <link href="~/css/custom-style.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<!-- === قسم الفلترة والبحث === -->
+<div class="card card-body mb-4 shadow-sm">
+    <form asp-action="Index" method="get">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="searchTerm" class="form-label">بحث بالمرجع أو رقم العميل</label>
+                <input type="text" name="searchTerm" class="form-control" value="@ViewBag.CurrentSearch" placeholder="...ادخل نص البحث" />
+            </div>
+            <div class="col-md-3">
+                <label for="startDate" class="form-label">من تاريخ</label>
+                <input type="date" name="startDate" class="form-control" value="@ViewBag.CurrentStartDate" />
+            </div>
+            <div class="col-md-3">
+                <label for="endDate" class="form-label">إلى تاريخ</label>
+                <input type="date" name="endDate" class="form-control" value="@ViewBag.CurrentEndDate" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>بحث</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- === عرض الكروت === -->
+@if (Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        // 1. تحديد البيانات الأساسية
+        string pName = item.ServProdFkNavigation?.ServProdName ?? "";
+        // جلب رابط الشعار من جدول المزودين (Provider)
+        string logoUrl = item.ServProdFkNavigation?.ServProvFkNavigation?.ProviderLogo;
+
+        // --- تحديد اتجاه السهم ولونه بناءً على النوع ---
+        // تم إضافة "ايداع" للشرط لتعتبر عملية خارجة باللون الأحمر
+        bool isOutflow = pName.Contains("سحب") || pName.Contains("ايداع");
+        string dirIcon = isOutflow ? "fa-arrow-up text-danger" : "fa-arrow-down text-success";
+        string textColor = isOutflow ? "text-danger" : "text-success";
+
+        <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+            <div class="transaction-card mb-3 d-flex align-items-center p-3 shadow-sm bg-white rounded" style="border: 1px solid #f1f1f1;">
+
+                <!-- الجزء الأول: شعار الشركة أو البنك (يمين) -->
+                <div class="ms-3 text-center" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    @if (!string.IsNullOrEmpty(logoUrl))
+                    {
+                        <img src="@logoUrl" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                    }
+                    else
+                    {
+                        @* أيقونة افتراضية في حال عدم وجود صورة في قاعدة البيانات *@
+                        <i class="fas fa-wallet fa-2x text-secondary"></i>
+                    }
+                </div>
+
+                <!-- الجزء الثاني: تفاصيل النص (منتصف) -->
+                <div class="flex-grow-1">
+                    <h6 class="fw-bold mb-1">
+                        @pName
+                    </h6>
+                    <div class="text-muted small">
+                        <!-- تم تغيير FullName الخاص بالمستلم إلى UserCode ليظهر اسم/كود المتجر -->
+                        من: <strong>@(item.SenderUser?.FullName ?? "-")</strong> | إلى: <strong>@(item.RecvrUser?.UserCode ?? "بيع مباشر")</strong>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.8rem;">
+                        الرصيد قبل: @item.SendrBlncBfr.ToString("N0") | بعد: @item.SendrBlncAftr.ToString("N0")
+                    </div>
+                </div>
+
+                <!-- الجزء الثالث: المبلغ والسهم (يسار) -->
+                <div class="d-flex align-items-center me-2">
+                    <div class="text-start px-2">
+                        <!-- تم استخدام المتغير textColor لتحديد لون المبلغ -->
+                        <div class="fw-bold @textColor" style="font-size: 1.1rem;">
+                            @item.TotalPriceTrx.ToString("N2")
+                        </div>
+                        <div class="text-muted small" dir="ltr">
+                            @item.DateAndTime.ToString("dd MMM, hh:mm tt")
+                        </div>
+                    </div>
+                    <div class="ms-2">
+                        <i class="fas @dirIcon fa-2x"></i>
+                    </div>
+                </div>
+
+            </div>
+        </a>
+    }
+}
+else
+{
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>
+        لا توجد معاملات تطابق معايير البحث الحالية.
+    </div>
+}
+
+<!-- === أزرار ترقيم الصفحات === -->
+<div class="d-flex justify-content-center mt-4">
+    @Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, searchTerm = ViewBag.CurrentSearch, startDate = ViewBag.CurrentStartDate, endDate = ViewBag.CurrentEndDate }),
+        new PagedListRenderOptions
+        {
+            UlElementClasses = new[] { "pagination" },
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            ActiveLiElementClass = "active"
+        })
+</div>

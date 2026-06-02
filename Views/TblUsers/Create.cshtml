@@ -1,0 +1,122 @@
+﻿@model DatabaseAccess.Models.TblUser
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>TblUser</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactNo" class="control-label"></label>
+                <input asp-for="ContactNo" class="form-control" />
+                <span asp-validation-for="ContactNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Photo" class="control-label"></label>
+                <input asp-for="Photo" class="form-control" />
+                <span asp-validation-for="Photo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Street" class="control-label"></label>
+                <input asp-for="Street" class="form-control" />
+                <span asp-validation-for="Street" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DistrectFk" class="control-label"></label>
+                <select asp-for="DistrectFk" class ="form-control" asp-items="ViewBag.DistrectFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="GovernateFk" class="control-label"></label>
+                <select asp-for="GovernateFk" class ="form-control" asp-items="ViewBag.GovernateFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Naid" class="control-label"></label>
+                <input asp-for="Naid" class="form-control" />
+                <span asp-validation-for="Naid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubEndDate" class="control-label"></label>
+                <input asp-for="SubEndDate" class="form-control" />
+                <span asp-validation-for="SubEndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserTypeFk" class="control-label"></label>
+                <select asp-for="UserTypeFk" class ="form-control" asp-items="ViewBag.UserTypeFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="DirctionFk" class="control-label"></label>
+                <select asp-for="DirctionFk" class ="form-control" asp-items="ViewBag.DirctionFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Priority" class="control-label"></label>
+                <input asp-for="Priority" class="form-control" />
+                <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyFk" class="control-label"></label>
+                <select asp-for="CompanyFk" class ="form-control" asp-items="ViewBag.CompanyFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="BranchFk" class="control-label"></label>
+                <select asp-for="BranchFk" class ="form-control" asp-items="ViewBag.BranchFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ParentUser" class="control-label"></label>
+                <input asp-for="ParentUser" class="form-control" />
+                <span asp-validation-for="ParentUser" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserCode" class="control-label"></label>
+                <input asp-for="UserCode" class="form-control" />
+                <span asp-validation-for="UserCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

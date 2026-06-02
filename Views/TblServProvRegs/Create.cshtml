@@ -1,0 +1,131 @@
+﻿@model DatabaseAccess.Models.TblServProvReg
+
+@{
+    ViewData["Title"] = "إضافة محفظة جديدة";
+}
+
+<!-- كارت التصميم الرئيسي -->
+<div class="card card-primary card-outline shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title fw-bold">
+            <i class="fas fa-plus-circle text-primary me-2"></i> بيانات المحفظة الجديدة
+        </h3>
+        <div class="card-tools">
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-right"></i> عودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <form asp-action="Create">
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="row">
+                <!-- العمود الأيمن -->
+                <div class="col-md-6">
+                    <!-- اختيار المندوب/التاجر -->
+                    <div class="mb-3">
+                        <label asp-for="UserFk" class="form-label fw-bold">المندوب / التاجر</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <select asp-for="UserFk" class="form-select select2" asp-items="ViewBag.UserFk">
+                                <option value="">-- اختر المندوب --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- مزود الخدمة -->
+                    <div class="mb-3">
+                        <label asp-for="ServProvFk" class="form-label fw-bold">مزود الخدمة</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-building"></i></span>
+                            <select asp-for="ServProvFk" class="form-select select2" asp-items="ViewBag.ServProvFk">
+                                <option value="">-- اختر المزود --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- الرصيد الافتتاحي -->
+                    <div class="mb-3">
+                        <label asp-for="Balance" class="form-label fw-bold">الرصيد الافتتاحي</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+                            <input asp-for="Balance" class="form-control" placeholder="0.00" type="number" step="0.01" />
+                        </div>
+                        <span asp-validation-for="Balance" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- العمود الأيسر -->
+                <div class="col-md-6">
+                    <!-- رقم المحفظة -->
+                    <div class="mb-3">
+                        <label asp-for="ServNo" class="form-label fw-bold">رقم المحفظة / الخدمة</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                            <input asp-for="ServNo" class="form-control" placeholder="أدخل رقم الهاتف أو الخدمة" />
+                        </div>
+                        <span asp-validation-for="ServNo" class="text-danger small"></span>
+                    </div>
+
+                    <!-- كود مختصر -->
+                    <div class="mb-3">
+                        <label asp-for="Code" class="form-label fw-bold">كود مختصر (Alias)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                            <input asp-for="Code" class="form-control" placeholder="مثال: Cash_Vodafone_01" />
+                        </div>
+                        <span asp-validation-for="Code" class="text-danger small"></span>
+                    </div>
+
+                    <!-- تاريخ التفعيل -->
+                    <div class="mb-3">
+                        <label asp-for="StartDate" class="form-label fw-bold">تاريخ التفعيل</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            <!-- تم وضع تاريخ اليوم كقيمة افتراضية -->
+                            <input asp-for="StartDate" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <span asp-validation-for="StartDate" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حالة التفعيل -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="IsActiveSwitch" name="IsActive" value="true" checked>
+                        <label class="form-check-label fw-bold" for="IsActiveSwitch">تفعيل المحفظة فوراً</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer text-end">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-save"></i> حـفـظ البيانات
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // تفعيل Select2 للقوائم المنسدلة لجعل شكلها أفضل وقابلة للبحث
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dir: "rtl",
+                language: "ar"
+            });
+        });
+    </script>
+}

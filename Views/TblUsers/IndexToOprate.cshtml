@@ -1,0 +1,213 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblUser>
+
+@{
+    ViewData["Title"] = "قائمة التجار - العمليات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <!-- تم نقل الأنماط هنا لتكون ضمن قسم Styles في الـ Layout -->
+    <style>
+        .search-container {
+            margin-bottom: 2rem;
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .user-grid {
+            display: grid;
+            /* الشبكة ستتكيف تلقائياً بناءً على حجم الشاشة */
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .user-card {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .user-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+        .user-card-header {
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .user-shop-name {
+            font-weight: 700;
+            font-size: 1.3rem; /* تصغير الخط قليلاً ليتناسب بشكل أفضل */
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-full-name { /* تم تعديل الاسم ليعبر عن المحتوى (رقم الهاتف) */
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+            direction: ltr; /* لجعل رقم الهاتف يظهر من اليسار لليمين */
+            text-align: center;
+        }
+
+        /* --- ✅✅✅ التعديل الأهم هنا ✅✅✅ --- */
+        .user-card-actions {
+            display: flex; /* استخدام Flexbox */
+            flex-wrap: wrap; /* السماح للأزرار بالالتفاف لسطر جديد */
+            justify-content: center; /* توسيط الأزرار */
+            gap: 0.5rem; /* مسافة بين الأزرار */
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            margin-top: auto;
+        }
+
+            .user-card-actions .btn {
+                flex-grow: 1; /* جعل الأزرار تأخذ مساحة متساوية */
+                min-width: 120px; /* تحديد عرض أدنى للزر */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: 0.85rem; /* تصغير خط الزر قليلاً */
+                padding: 0.6rem;
+                border-radius: 0.5rem;
+            }
+
+                .user-card-actions .btn i {
+                    margin-left: 8px; /* تغيير المسافة لتكون على اليسار (بسبب RTL) */
+                    margin-right: 0;
+                }
+
+        /* Custom button color (موجودة بالفعل لديك) */
+        .btn-purple {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+            color: white;
+        }
+
+            .btn-purple:hover {
+                background-color: #5a34a3;
+                border-color: #5a34a3;
+                color: white;
+            }
+
+        /* ✅ إضافة بسيطة لإظهار مؤشر التحميل */
+        #loadingSpinner {
+            display: none; /* مخفي بشكل افتراضي */
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <!-- Card for Search Functionality -->
+    <div class="card search-container">
+        <div class="card-body p-2">
+            <h4 class="mb-3">@ViewData["Title"]</h4>
+            <input type="text" id="searchInput" placeholder="ابحث بالاسم أو رقم الهاتف..." class="form-control" />
+        </div>
+    </div>
+
+    <!-- Grid of User Cards -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">لا يوجد تجار لعرضهم.</div>
+    }
+    else
+    {
+        <div class="user-grid" id="userCardsContainer">
+            @await Html.PartialAsync("_OprateCardsPartial", Model)
+        </div>
+
+        <!-- ✅ إضافة مؤشر التحميل ورسالة النهاية -->
+        <div id="loadingSpinner">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div id="noMoreDataMessage" class="alert alert-secondary text-center mt-3" style="display: none;">
+            لا يوجد المزيد من التجار لعرضهم.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script type="text-javascript">
+        $(document).ready(function () {
+            // --- 🛑 كود البحث الحالي لا يعمل مع التحميل المستمر، سيتم استبداله ---
+            // $("#searchInput").on("keyup", ...);
+
+            // ==========================================================
+            // ✅✅✅ كود الـ Infinite Scroll الجديد
+            // ==========================================================
+            let page = 1;
+            let isLoading = false;
+            // جلب القيمة من الـ ViewBag وتخزينها في متغير JavaScript
+            let hasMorePages = @Html.Raw(Json.Serialize(ViewBag.HasMorePages));
+
+            $(window).on('scroll', function () {
+                // الشرط: هل وصلنا لنهاية الصفحة؟ وهل هناك صفحات أخرى؟ وهل نحن لا نقوم بالتحميل حالياً؟
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && hasMorePages && !isLoading) {
+                    isLoading = true; // منع طلبات التحميل المتعددة
+                    $('#loadingSpinner').show(); // إظهار مؤشر التحميل
+                    page++; // زيادة رقم الصفحة
+
+                    // طلب AJAX لجلب الصفحة التالية
+                    $.get(`/TblUsers/GetOprateUsers?page=${page}`, function (data) {
+                        if (data.trim() !== "") {
+                            $('#userCardsContainer').append(data); // إضافة البطاقات الجديدة
+                        } else {
+                            hasMorePages = false; // لا توجد صفحات أخرى
+                            $('#noMoreDataMessage').show(); // إظهار رسالة النهاية
+                        }
+                    }).always(function() {
+                        isLoading = false; // السماح بطلب تحميل جديد
+                        $('#loadingSpinner').hide(); // إخفاء مؤشر التحميل
+                    });
+                }
+            });
+
+
+            // ==========================================================
+            // ✅✅✅ كود البحث المحدث ليعمل مع AJAX
+            // ==========================================================
+            let searchTimeout;
+            $("#searchInput").on("keyup", function () {
+                clearTimeout(searchTimeout); // إلغاء المؤقت السابق عند كل ضغطة
+                const searchTerm = $(this).val();
+
+                if (searchTerm.length === 0) {
+                    // إذا كان البحث فارغًا، يجب إعادة تحميل الصفحة بالكامل لإعادة تفعيل الـ Infinite Scroll
+                    // هذا هو أبسط حل، الحلول الأخرى أكثر تعقيداً
+                    location.reload();
+                    return;
+                }
+
+                if (searchTerm.length < 3) return; // لا تبحث إلا بعد 3 أحرف
+
+                searchTimeout = setTimeout(function() {
+                    $('#loadingSpinner').show();
+                    // عند البحث، قم بتعطيل التحميل المستمر مؤقتاً
+                    hasMorePages = false;
+
+                    $.get(`/TblUsers/SearchUsers?searchTerm=${searchTerm}`, function (data) {
+                        $('#userCardsContainer').html(data); // استبدال المحتوى بنتائج البحث
+                        $('#loadingSpinner').hide();
+                        $('#noMoreDataMessage').hide();
+                    });
+                }, 500); // انتظر 500 مللي ثانية بعد توقف المستخدم عن الكتابة
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,192 @@
+﻿@model CollectTransactViewModel
+@{
+    ViewData["Title"] = "جرد التحصيل";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- إضافة قسم للـ Styles لتضمين التنسيقات الخاصة بالبطاقات -->
+@section Styles {
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* يمكن وضع التنسيقات الإضافية هنا أو في ملف site.css */
+        #total-sum-container {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        #loader {
+            display: none; /* مخفي بشكل افتراضي */
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <!-- بطاقة الفلاتر -->
+    <div class="card card-primary card-outline mb-4">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-filter me-2"></i>فلترة النتائج</h3>
+        </div>
+        <div class="card-body">
+            <form id="filterForm">
+                @Html.AntiForgeryToken()
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="fromDate" class="form-label">من تاريخ</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control" value="@Model.FromDate.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="toDate" class="form-label">إلى تاريخ</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control" value="@Model.ToDate.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchQuery" class="form-label">بحث شامل</label>
+                        <input type="search" id="searchQuery" name="searchQuery" class="form-control" placeholder="ابحث بالاسم أو الرقم المرجعي...">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i> عرض</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- حاوية عرض النتائج والإجمالي -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0"><i class="fas fa-receipt me-2"></i>سجل العمليات</h3>
+            <div id="total-sum-container">
+                الإجمالي: <span class="badge bg-success p-2" id="total-sum">0.00</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- هنا سيتم عرض البطاقات -->
+            <div id="transactions-container">
+                <!-- Skeleton loaders will be shown here -->
+            </div>
+            <!-- مؤشر التحميل للصفحات التالية -->
+            <div id="loader">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div id="no-more-data" class="text-center text-muted py-3" style="display: none;">
+                لا توجد المزيد من النتائج
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let currentPage = 1;
+            let isLoading = false;
+            let hasMoreData = true;
+
+            // دالة لعرض Skeleton Loaders
+            function showSkeletonLoaders(count) {
+                let skeletonHtml = '';
+                for (let i = 0; i < count; i++) {
+                    skeletonHtml += '<div class="skeleton-card"></div>';
+                }
+                $('#transactions-container').html(skeletonHtml);
+            }
+
+            // الدالة الرئيسية لجلب البيانات
+            function loadTransactions(page, isFilterChange = false) {
+                if (isLoading || (!hasMoreData && !isFilterChange)) return; // تعديل بسيط لمنع التوقف عند الفلترة
+
+                isLoading = true;
+
+                if (isFilterChange) {
+                    currentPage = 1;
+                    hasMoreData = true;
+                    $('#transactions-container').empty(); // مسح النتائج القديمة عند تغيير الفلتر
+                    showSkeletonLoaders(5); // عرض مؤشرات التحميل عند البحث الجديد
+                    $('#no-more-data').hide();
+                } else {
+                    $('#loader').show(); // عرض مؤشر التحميل عند التمرير
+                }
+
+                const form = $('#filterForm');
+                const data = {
+                    fromDate: $('#fromDate').val(),
+                    toDate: $('#toDate').val(),
+                    searchQuery: $('#searchQuery').val(),
+                    page: page
+                };
+
+                $.ajax({
+                    url: '@Url.Action("LoadCollectionTransactions", "TblDebtTrnsActs")',
+                    type: 'POST',
+                    data: data,
+                    headers: {
+                        'RequestVerificationToken': form.find('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response, status, xhr) {
+                        if (isFilterChange) {
+                            $('#transactions-container').empty(); // مسح الـ Skeletons
+                            const totalSum = xhr.getResponseHeader('X-Total-Sum');
+                            if (totalSum) {
+                                $('#total-sum').text(totalSum);
+                            } else {
+                                 $('#total-sum').text('0.00');
+                            }
+                        }
+
+                        if (response.trim() === "") {
+                             if(currentPage === 1){
+                                 $('#transactions-container').html('<div class="alert alert-info text-center">لا توجد نتائج تطابق بحثك.</div>');
+                             }
+                             hasMoreData = false;
+                             $('#no-more-data').show();
+                        } else {
+                            $('#transactions-container').append(response);
+                            currentPage++;
+                            hasMoreData = xhr.getResponseHeader('X-Has-More-Data').toLowerCase() === 'true';
+                            if (!hasMoreData) {
+                                $('#no-more-data').show();
+                            }
+                        }
+                    },
+                    error: function (xhr) {
+                        // عرض رسالة خطأ للمستخدم
+                        $('#transactions-container').html(`<div class="alert alert-danger text-center">حدث خطأ: ${xhr.responseText}</div>`);
+                    },
+                    complete: function () {
+                        isLoading = false;
+                        $('#loader').hide();
+                    }
+                });
+            }
+
+            // 1. تحميل البيانات عند فتح الصفحة لأول مرة
+            loadTransactions(currentPage, true);
+
+            // 2. عند الضغط على زر البحث
+            $('#filterForm').submit(function (e) {
+                e.preventDefault();
+                loadTransactions(1, true);
+            });
+
+                    // ====> (إضافة جديدة) التحديث التلقائي عند تغيير التاريخ <====
+        $('#fromDate, #toDate').on('change', function() {
+            // نقوم بتشغيل البحث تلقائياً عند تغيير التاريخ
+            loadTransactions(1, true);
+        });
+
+            // 3. التحميل عند التمرير (Infinite Scroll)
+            $(window).scroll(function () {
+                // تحقق إذا وصل المستخدم لنهاية الصفحة
+                if ($(window).scrollTop() + $(window).height() > $(document).height() - 200) {
+                     if (!isLoading && hasMoreData) {
+                        loadTransactions(currentPage);
+                     }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,109 @@
+﻿@model DatabaseAccess.Models.TblBlncTrnsAct
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TblBlncTrnsAct</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="UserFk" class="control-label"></label>
+                <select asp-for="UserFk" class="form-control" asp-items="ViewBag.UserFk"></select>
+                <span asp-validation-for="UserFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReferenceCode" class="control-label"></label>
+                <input asp-for="ReferenceCode" class="form-control" />
+                <span asp-validation-for="ReferenceCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrUserId" class="control-label"></label>
+                <select asp-for="SendrUserId" class="form-control" asp-items="ViewBag.SendrUserId"></select>
+                <span asp-validation-for="SendrUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrRegId" class="control-label"></label>
+                <select asp-for="SendrRegId" class="form-control" asp-items="ViewBag.SendrRegId"></select>
+                <span asp-validation-for="SendrRegId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrUserId" class="control-label"></label>
+                <select asp-for="RecvrUserId" class="form-control" asp-items="ViewBag.RecvrUserId"></select>
+                <span asp-validation-for="RecvrUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrRegId" class="control-label"></label>
+                <select asp-for="RecvrRegId" class="form-control" asp-items="ViewBag.RecvrRegId"></select>
+                <span asp-validation-for="RecvrRegId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlncTrnsfr" class="control-label"></label>
+                <input asp-for="BlncTrnsfr" class="form-control" />
+                <span asp-validation-for="BlncTrnsfr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrBlncBfr" class="control-label"></label>
+                <input asp-for="SendrBlncBfr" class="form-control" />
+                <span asp-validation-for="SendrBlncBfr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrBlncAftr" class="control-label"></label>
+                <input asp-for="SendrBlncAftr" class="form-control" />
+                <span asp-validation-for="SendrBlncAftr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrBlncBfr" class="control-label"></label>
+                <input asp-for="RecvrBlncBfr" class="form-control" />
+                <span asp-validation-for="RecvrBlncBfr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrBlncAftr" class="control-label"></label>
+                <input asp-for="RecvrBlncAftr" class="form-control" />
+                <span asp-validation-for="RecvrBlncAftr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransDate" class="control-label"></label>
+                <input asp-for="TransDate" class="form-control" />
+                <span asp-validation-for="TransDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateAndTime" class="control-label"></label>
+                <input asp-for="DateAndTime" class="form-control" />
+                <span asp-validation-for="DateAndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProdidFk" class="control-label"></label>
+                <select asp-for="ProdidFk" class="form-control" asp-items="ViewBag.ProdidFk"></select>
+                <span asp-validation-for="ProdidFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransTypeId" class="control-label"></label>
+                <select asp-for="TransTypeId" class="form-control" asp-items="ViewBag.TransTypeId"></select>
+                <span asp-validation-for="TransTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

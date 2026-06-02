@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "قائمة المنتجات";
+}
+
+<!-- إضافة CSS مخصص للكروت داخل الصفحة أو في ملف site.css -->
+@section Styles {
+    <style>
+        .product-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            }
+
+        .card-top-line {
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background-color: #0d6efd; /* لون أزرق */
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+            .btn-link:hover {
+                background-color: #f8f9fa;
+            }
+    </style>
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="m-0 text-dark fw-bold">إدارة منتجات الخدمة</h3>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus-circle"></i> إضافة منتج جديد
+        </a>
+    </div>
+
+    <!-- حاوية الكروت -->
+    <div class="row" id="cardsContainer">
+        <!-- سيتم تحميل الكروت هنا تلقائياً -->
+    </div>
+
+    <!-- مؤشر التحميل -->
+    <div id="loading" class="text-center py-5" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <p class="mt-2 text-muted">جاري تحميل المنتجات...</p>
+    </div>
+
+    <!-- رسالة انتهاء البيانات -->
+    <div id="noMoreData" class="text-center py-4 text-muted" style="display:none;">
+        <p>تم عرض جميع المنتجات.</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let pageNumber = 1;
+            let pageSize = 12; // يفضل أن يكون الرقم من مضاعفات 3 أو 4 ليتناسب مع الشبكة
+            let isLoading = false;
+            let hasMoreData = true;
+
+            function loadData() {
+                if (isLoading || !hasMoreData) return;
+
+                isLoading = true;
+                $("#loading").show();
+
+                $.ajax({
+                    // تأكد من أن اسم الدالة في الـ Controller هو GetProductsData
+                    url: '@Url.Action("GetProductsData", "TblServProducts")',
+                    type: 'GET',
+                    data: { pageNumber: pageNumber, pageSize: pageSize },
+                    success: function (data) {
+                        if (data && data.trim().length > 0) {
+                            $("#cardsContainer").append(data);
+                            pageNumber++;
+                        } else {
+                            hasMoreData = false;
+                            $("#noMoreData").show();
+                        }
+                    },
+                    error: function () {
+                        console.log("Error loading data.");
+                    },
+                    complete: function () {
+                        isLoading = false;
+                        $("#loading").hide();
+                    }
+                });
+            }
+
+            // تحميل الدفعة الأولى
+            loadData();
+
+            // الاستماع لتمرير الصفحة بالكامل
+            $(window).scroll(function () {
+                // التحقق إذا وصل المستخدم لقرب نهاية الصفحة (قبل 200 بكسل)
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                    loadData();
+                }
+            });
+        });
+    </script>
+}

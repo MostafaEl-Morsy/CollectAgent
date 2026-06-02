@@ -1,0 +1,187 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblBlncTrnsAct>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+@section Styles {
+    <link href="~/css/custom-style.css" rel="stylesheet" asp-append-version="true" />
+}
+
+@{
+    ViewData["Title"] = "عمليات التحويل";
+}
+
+<!-- قسم الفلترة -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form id="filterForm" onsubmit="return false;">
+            <div class="row align-items-end g-3">
+                <div class="col-md-2 col-6">
+                    <label class="form-label">من تاريخ</label>
+                    <input type="date" id="FromDate" name="fromDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-md-2 col-6">
+                    <label class="form-label">إلى تاريخ</label>
+                    <input type="date" id="ToDate" name="toDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">فلترة بحساباتي</label>
+                    <select id="SenderRegId" name="senderRegId" class="form-select" asp-items="ViewBag.UserAccounts">
+                        <option value="">-- كل حساباتي --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">بحث بالاسم أو الرقم</label>
+                    <input type="text" id="searchQuery" name="searchQuery" placeholder="بحث..." class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> عرض
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- قسم عرض النتائج -->
+<div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 card-title">سجل العمليات</h5>
+        <h5 class="mb-0">الإجمالي: <span id="totalSum" class="fw-bold text-primary">@ViewBag.TotalSum</span></h5>
+    </div>
+    <div class="card-body" style="background-color: #f8f9fa; padding: 1rem;">
+        <!-- حاوية عرض البطاقات -->
+        <div id="transaction-list">
+            @if (!Model.Any())
+            {
+                <p class="text-center text-muted mt-3">لا توجد عمليات لهذا اليوم.</p>
+            }
+            else
+            {
+                @await Html.PartialAsync("_TransactionCardPartial", Model)
+            }
+        </div>
+
+        <!-- الهيكل العظمي للتحميل (Loader) -->
+        <div id="loader" style="display: none;">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+        </div>
+
+        <!-- رسالة نهاية البيانات -->
+        <div id="no-more-data" class="text-center p-3 text-muted" style="display: none;">
+            -- لا يوجد المزيد من العمليات --
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // نبدأ من الصفحة الثانية لأن الصفحة الأولى تم تحميلها بالفعل من السيرفر
+            let currentPage = 2;
+            let isLoading = false;
+            let hasMoreData = true;
+
+            // دالة مركزية لجلب البيانات
+            function loadTransactions(isNewFilter) {
+                if (isLoading || (!hasMoreData && !isNewFilter)) return;
+
+                isLoading = true;
+                $('#loader').show();
+
+                // إذا كانت هذه فلترة جديدة، أعد تعيين كل شيء
+                if (isNewFilter) {
+                    currentPage = 1;
+                    hasMoreData = true;
+                    $('#transaction-list').empty();
+                    $('#no-more-data').hide();
+                }
+
+                const data = {
+                    fromDate: $('#FromDate').val(),
+                    toDate: $('#ToDate').val(),
+                    searchQuery: $('#searchQuery').val(),
+                    senderRegId: $('#SenderRegId').val(), // ✅ إرسال قيمة الحساب المختار
+                    page: currentPage
+                };
+
+                $.ajax({
+                    url: '@Url.Action("LoadTransactions", "TblBlncTrnsActs")',
+                    type: 'POST',
+                    // لإرسال التوكن الخاص بالحماية من هجمات CSRF مع طلب AJAX
+                    headers: {
+                        "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                    },
+                    data: data,
+                    success: function (response, status, xhr) {
+                        $('#loader').hide();
+
+                        if (response.trim() !== "") {
+                            $('#transaction-list').append(response);
+                            currentPage++; // جهّز لطلب الصفحة التالية
+                        } else {
+                            hasMoreData = false;
+                            // أظهر رسالة "لا يوجد المزيد" فقط إذا كانت هناك نتائج بالفعل
+                            if ($('#transaction-list').children().length > 0) {
+                                $('#no-more-data').show();
+                            } else {
+                                 $('#transaction-list').html('<p class="text-center text-muted mt-3">لا توجد نتائج تطابق بحثك.</p>');
+                            }
+                        }
+
+                        // تحديث الإجمالي فقط عند أول فلترة
+                        if (isNewFilter) {
+                             const totalSum = xhr.getResponseHeader("X-Total-Sum");
+                             if(totalSum) {
+                                 $('#totalSum').text(totalSum);
+                             } else {
+                                 $('#totalSum').text('0.00');
+                             }
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                         $('#loader').hide();
+                         // التعامل مع انتهاء صلاحية الجلسة
+                         if(jqXHR.status === 401) {
+                             alert("انتهت صلاحية الجلسة، سيتم إعادة توجيهك لصفحة الدخول.");
+                             window.location.href = '@Url.Action("Login", "Account")';
+                         } else {
+                             // يمكنك إضافة رسالة خطأ أكثر تفصيلاً هنا
+                             alert("حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى.");
+                         }
+                    },
+                    complete: function () {
+                        isLoading = false;
+                    }
+                });
+            }
+
+            // عند تقديم الفورم (الضغط على زر عرض أو Enter)
+            $('#filterForm').on('submit', function (e) {
+                e.preventDefault(); // منع إعادة تحميل الصفحة الافتراضية
+                loadTransactions(true); // استدعاء الدالة مع تحديد أنها فلترة جديدة
+            });
+
+            // ✅ تفعيل البحث تلقائياً بمجرد تغيير الحساب من القائمة المنسدلة
+            $('#SenderRegId').change(function() {
+                loadTransactions(true);
+            });
+
+            // التحميل عند التمرير لأسفل الصفحة
+            $(window).scroll(function () {
+                // تحقق إذا وصل المستخدم لنهاية الصفحة (مع هامش 200 بكسل)
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                    loadTransactions(false); // استدعاء الدالة لمجرد تحميل المزيد من البيانات
+                }
+            });
+
+        });
+    </script>
+}

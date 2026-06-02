@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "محافظ الكاش";
+}
+
+<div class="card shadow-none border-0 bg-transparent">
+    <div class="card-header border-0 bg-transparent ps-0">
+        <h3 class="card-title fw-bold">
+            <i class="fas fa-wallet text-primary me-2"></i> قائمة محافظ الكاش
+        </h3>
+        <div class="card-tools">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> إضافة محفظة جديدة
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <!-- حاوية البطاقات -->
+        <div class="row" id="wallets-container">
+            <!-- سيتم تحميل البيانات هنا تلقائياً -->
+        </div>
+
+        <!-- مؤشر التحميل (Loading Spinner) -->
+        <div id="loading-spinner" class="text-center py-4" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+            <p class="mt-2 text-muted">جاري تحميل المزيد من المحافظ...</p>
+        </div>
+
+        <!-- رسالة نهاية البيانات -->
+        <div id="no-more-data" class="text-center py-4 text-muted" style="display: none;">
+            <p>لا توجد محافظ أخرى لعرضها.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let pageIndex = 1;
+            const pageSize = 9; // عدد الكروت في كل سحبة
+            let isLoading = false;
+            let hasMoreData = true;
+
+            // دالة لجلب البيانات
+            function loadWallets() {
+                if (isLoading || !hasMoreData) return;
+
+                isLoading = true;
+                $("#loading-spinner").show();
+
+                $.ajax({
+                    url: '@Url.Action("GetWalletsData", "TblServProvRegs")',
+                    type: 'GET',
+                    data: { pageIndex: pageIndex, pageSize: pageSize },
+                    success: function (data) {
+                        if ($.trim(data)) {
+                            // إذا عادت بيانات، أضفها للحاوية
+                            $("#wallets-container").append(data);
+                            pageIndex++;
+                        } else {
+                            // إذا لم تعد بيانات، أوقف الطلبات المستقبلية
+                            hasMoreData = false;
+                            $("#no-more-data").show();
+                        }
+                    },
+                    error: function () {
+                        alert("حدث خطأ أثناء تحميل البيانات.");
+                    },
+                    complete: function () {
+                        isLoading = false;
+                        $("#loading-spinner").hide();
+                    }
+                });
+            }
+
+            // تحميل أول دفعة عند فتح الصفحة
+            loadWallets();
+
+            // الاستماع لحدث التمرير (Infinite Scroll Logic)
+            $(window).scroll(function () {
+                // التحقق مما إذا كان المستخدم وصل لأسفل الصفحة (قبل النهاية بـ 100 بيكسل)
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                    loadWallets();
+                }
+            });
+        });
+    </script>
+}

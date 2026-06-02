@@ -1,0 +1,67 @@
+﻿@model PreCreateViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    var merchantId = ViewData["MerchantId"] is int id ? id : 0;
+}
+
+@section Styles {
+    <!-- نضع الرابط هنا داخل قسم الأنماط -->
+    <link rel="stylesheet" href="~/css/custom-style.css" asp-append-version="true" />
+}
+
+<!-- Section Header -->
+<div class="context-header mb-4">
+    <div class="provider-info">
+        <i class="fas fa-bolt me-2"></i>
+        <span>@Model.ProviderName</span>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.MerchantName))
+    {
+        <div class="merchant-info">
+            <i class="fas fa-user-tag me-2"></i>
+            <span>شحن للتاجر: <strong>@Model.MerchantName</strong></span>
+        </div>
+    }
+    else
+    {
+        <div class="merchant-info">
+            <i class="fas fa-user me-2"></i>
+            <span>تحويل مباشر</span>
+        </div>
+    }
+</div>
+
+@if (!Model.Products.Any())
+{
+    <div class="alert alert-warning text-center">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        لا توجد منتجات متاحة حالياً لهذا المزود.
+    </div>
+}
+else
+{
+    <div class="modern-product-grid">
+        @foreach (var item in Model.Products)
+        {
+            // بناء الرابط لصفحة الإنشاء النهائية
+            // سنستخدم TempData لقراءة القيم في دالة Create
+            var actionUrl = Url.Action("Create", "TblServTrnxes", new { productId = item.ProductId, prodRegID = item.prodRegID, merchantId = merchantId });
+
+            // متغير جديد لتمرير رابط الشعار إلى CSS
+            var logoUrl = !string.IsNullOrEmpty(item.ProviderLogoUrl) ? Url.Content(item.ProviderLogoUrl) : "";
+            var cardStyle = $"--bg-logo: url('{logoUrl}');";
+
+            // تم تغيير بنية البطاقة بالكامل
+            <a href="@actionUrl" class="modern-product-card" style="@cardStyle">
+                <div class="card-content">
+                    <h3 class="product-title">@item.ProductName</h3>
+                    <div class="action-button">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span>اختر الخدمة</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+}

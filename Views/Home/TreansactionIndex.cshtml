@@ -1,0 +1,79 @@
+﻿@{
+    ViewBag.Title = "الجـرد و العملـيات";
+    ViewBag.Lable = "الرئـيسـية ";
+    ViewBag.Url = @Url.Action("SwitchAction", "Home");
+}
+
+@section Styles{
+    <link href="~/css/custom-style.css" rel="stylesheet" />
+}
+
+@{
+    // <-- الخطوة 2: استخدم البيانات التي تم تمريرها من الـ Controller -->
+    var BalancTransferIndex = Url.Action("Index", "TblBlncTrnsActs", new { @senderid = ViewBag.CurrentUserId });
+    var CollectTransactIndex = Url.Action("CollectTransactIndex", "TblDebtTrnsActs", new { @senderid = ViewBag.CurrentUserId });
+    var ServiceTrxIndex = Url.Action("Index", "TblServTrnxes", new { @senderid = ViewBag.CurrentUserId });
+    var Index = Url.Action("Index", "TblDepositOrders");
+}
+
+<h3 class="text-danger">@ViewBag.errorMessage</h3>
+
+<!-- START new modern choice grid -->
+<div class="choice-grid">
+
+    <!-- Card 1: التحويل -->
+    <a href="@BalancTransferIndex" class="choice-card-link">
+        <div class="choice-card">
+            <div class="choice-card-icon-wrapper bg-primary-soft">
+                <em class="fa fa-exchange fa-2x text-primary"></em>
+            </div>
+            <div class="choice-card-content">
+                <h3 class="choice-card-title">التحــويـل</h3>
+                <p class="choice-card-description">عمـليـات التحـويـل بين الحسابات</p>
+            </div>
+        </div>
+    </a>
+
+    <!-- Card 2: التحصيل -->
+    <a href="@CollectTransactIndex" class="choice-card-link">
+        <div class="choice-card">
+            <div class="choice-card-icon-wrapper bg-success-soft">
+                <em class="fa fa-hand-holding-usd fa-2x text-success"></em>
+            </div>
+            <div class="choice-card-content">
+                <h3 class="choice-card-title">التحــصيـل</h3>
+                <p class="choice-card-description">عملـيات تحـصيـل الأموال</p>
+            </div>
+        </div>
+    </a>
+
+    <!-- Card 3: المحافظ (مشروط) -->
+    @* @if (ViewBag.CurrentUserType < 8)
+    { *@
+        <a href="@ServiceTrxIndex" class="choice-card-link">
+            <div class="choice-card">
+                <div class="choice-card-icon-wrapper bg-danger-soft">
+                    <em class="fa fa-wallet fa-2x text-danger"></em>
+                </div>
+                <div class="choice-card-content">
+                    <h3 class="choice-card-title">عـمـلـيـات الـمـحـافــظ</h3>
+                    <p class="choice-card-description">عمـليـات السـحــب والإيـــداع</p>
+                </div>
+            </div>
+        </a>
+    @* } *@
+
+    <!-- Card 4: النقدية -->
+    <a href="@Index" class="choice-card-link">
+        <div class="choice-card">
+            <div class="choice-card-icon-wrapper bg-warning-soft">
+                <em class="fa fa-cash-register fa-2x text-warning"></em>
+            </div>
+            <div class="choice-card-content">
+                <h3 class="choice-card-title">النـقـدية والتوريد</h3>
+                <p class="choice-card-description">جـرد النقدية والتوريد البنكي</p>
+            </div>
+        </div>
+    </a>
+
+</div>

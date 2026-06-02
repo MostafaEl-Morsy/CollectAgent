@@ -1,0 +1,89 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblOrder>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IndebtBefore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BlncAmntOrder)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IndebtAfter)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TransDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateAndTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProdidFkNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegidFkNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StatusFkNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserFkNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IndebtBefore)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BlncAmntOrder)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IndebtAfter)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateAndTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProdidFkNavigation.ProductCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegidFkNavigation.AccNameNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StatusFkNavigation.StatusName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserFkNavigation.ContactNo)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

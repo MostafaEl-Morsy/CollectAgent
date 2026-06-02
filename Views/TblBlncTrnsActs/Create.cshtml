@@ -1,0 +1,67 @@
+﻿@model DatabaseAccess.Models.TblBlncTrnsAct
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>TblBlncTrnsAct</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UserFk" class="control-label"></label>
+                <select asp-for="UserFk" class ="form-control" asp-items="ViewBag.UserFk"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrUserId" class="control-label"></label>
+                <select asp-for="SendrUserId" class ="form-control" asp-items="ViewBag.SendrUserId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrRegId" class="control-label"></label>
+                <select asp-for="SendrRegId" class ="form-control" asp-items="ViewBag.SendrRegId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrUserId" class="control-label"></label>
+                <select asp-for="RecvrUserId" class ="form-control" asp-items="ViewBag.RecvrUserId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrRegId" class="control-label"></label>
+                <select asp-for="RecvrRegId" class ="form-control" asp-items="ViewBag.RecvrRegId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlncTrnsfr" class="control-label"></label>
+                <input asp-for="BlncTrnsfr" class="form-control" />
+                <span asp-validation-for="BlncTrnsfr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransDate" class="control-label"></label>
+                <input asp-for="TransDate" class="form-control" />
+                <span asp-validation-for="TransDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateAndTime" class="control-label"></label>
+                <input asp-for="DateAndTime" class="form-control" />
+                <span asp-validation-for="DateAndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProdidFk" class="control-label"></label>
+                <select asp-for="ProdidFk" class ="form-control" asp-items="ViewBag.ProdidFk"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,209 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblDrwerTransAction>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RefCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own500)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own200)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own100)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own50)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own20)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own10)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Own5)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TtlAmntOwned)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le500)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le200)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le100)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le50)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le20)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le10)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Le5)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TtlAmntTrnsAct)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After500)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After200)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After100)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After50)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After20)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After10)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.After5)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TtlAmntAfter)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TransDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateAndTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DrawerIdFkNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TransType)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RefCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own500)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own200)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own100)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own50)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own20)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own10)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Own5)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TtlAmntOwned)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le500)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le200)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le100)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le50)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le20)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le10)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Le5)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TtlAmntTrnsAct)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After500)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After200)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After100)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After50)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After20)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After10)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.After5)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TtlAmntAfter)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateAndTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DrawerIdFkNavigation.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransType.TransTypeName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

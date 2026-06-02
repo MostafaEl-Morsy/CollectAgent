@@ -1,0 +1,170 @@
+﻿@model DatabaseAccess.Models.TblDepositOrder
+
+@{
+    ViewData["Title"] = "تفاصيل الإيداع";
+    // تحديد لون الحالة بناءً على اسم الحالة أو رقمها
+    string statusBadgeClass = Model.StatusId == 2 ? "bg-success" : (Model.StatusId == 3 ? "bg-danger" : "bg-warning");
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+
+            <!-- البطاقة الرئيسية -->
+            <div class="card card-primary card-outline shadow-sm">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>
+                        تفاصيل طلب الإيداع #@Model.Id
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge @statusBadgeClass fs-6">
+                            @Html.DisplayFor(model => model.Status.StatusName)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <!-- القسم الأيمن: البيانات الأساسية -->
+                        <div class="col-lg-7">
+                            <h5 class="text-primary mb-3 border-bottom pb-2">البيانات الأساسية</h5>
+
+                            <dl class="row">
+                                <dt class="col-sm-4 text-muted">رقم المرجع:</dt>
+                                <dd class="col-sm-8 fw-bold">@Model.ReferenceCode</dd>
+
+                                <dt class="col-sm-4 text-muted">تاريخ الإيداع:</dt>
+                                <dd class="col-sm-8">@Model.Date</dd>
+
+                                <dt class="col-sm-4 text-muted">نوع الإيداع:</dt>
+                                <dd class="col-sm-8">
+                                    @{
+                                        string typeName = Model.DepositType switch
+                                        {
+                                            1 => "إيداع لمزود خدمة",
+                                            2 => "تحويل لتاجر",
+                                            _ => "غير محدد"
+                                        };
+                                    }
+                                    @typeName
+                                </dd>
+
+                                <dt class="col-sm-4 text-muted">المبلغ الإجمالي:</dt>
+                                <dd class="col-sm-8 text-success fw-bold fs-5">@Model.DepositAmount.ToString("N0") ج.م</dd>
+
+                                @if (!string.IsNullOrEmpty(Model.DepositAccNo) && Model.DepositAccNo != "0")
+                                {
+                                    <dt class="col-sm-4 text-muted">رقم الحساب:</dt>
+                                    <dd class="col-sm-8">@Model.DepositAccNo</dd>
+                                }
+
+                                <dt class="col-sm-4 text-muted">اسم المندوب/التاجر:</dt>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.UserIdFkNavigation.ContactNo) - @Html.DisplayFor(model => model.UserIdFkNavigation.UserCode)</dd>
+
+                                @if (Model.ProviderIdFkNavigation != null && Model.ProviderIdFk > 1)
+                                {
+                                    <dt class="col-sm-4 text-muted">المزود (Provider):</dt>
+                                    <dd class="col-sm-8">@Model.ProviderIdFkNavigation.ProviderName</dd>
+                                }
+
+                                @if (Model.DepositForNavigation != null)
+                                {
+                                    <dt class="col-sm-4 text-muted">إيداع لصالح:</dt>
+                                    <dd class="col-sm-8">@Model.DepositForNavigation.UserCode (@Model.DepositForNavigation.ContactNo)</dd>
+                                }
+                            </dl>
+                        </div>
+
+                        <!-- القسم الأيسر: صورة الإيصال -->
+                        <div class="col-lg-5 text-center">
+                            <h5 class="text-primary mb-3 border-bottom pb-2">صورة الإيصال</h5>
+                            @if (!string.IsNullOrEmpty(Model.DepositPhoto))
+                            {
+                                <div class="border rounded p-2 bg-light">
+                                    <!-- الصورة تفتح Modal عند الضغط -->
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal">
+                                        <img src="@Model.DepositPhoto" class="img-fluid rounded shadow-sm" style="max-height: 250px;" alt="صورة الإيداع" />
+                                    </a>
+                                    <p class="text-muted small mt-2"><i class="fas fa-search-plus"></i> اضغط للتكبير</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-image"></i> لا توجد صورة مرفقة
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- قسم تفاصيل فئات النقدية -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3 border-bottom pb-2">تفاصيل الفئات النقدية (الكاش)</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>فئة 200</th>
+                                            <th>فئة 100</th>
+                                            <th>فئة 50</th>
+                                            <th>فئة 20</th>
+                                            <th>فئة 10</th>
+                                            <th>فئة 5</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="@(Model.Le200 > 0 ? "fw-bold" : "text-muted")">@Model.Le200</td>
+                                            <td class="@(Model.Le100 > 0 ? "fw-bold" : "text-muted")">@Model.Le100</td>
+                                            <td class="@(Model.Le50 > 0 ? "fw-bold" : "text-muted")">@Model.Le50</td>
+                                            <td class="@(Model.Le20 > 0 ? "fw-bold" : "text-muted")">@Model.Le20</td>
+                                            <td class="@(Model.Le10 > 0 ? "fw-bold" : "text-muted")">@Model.Le10</td>
+                                            <td class="@(Model.Le5 > 0 ? "fw-bold" : "text-muted")">@Model.Le5</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right"></i> عودة للقائمة
+                        </a>
+
+                        @if (Model.StatusId == 1) // يظهر زر التعديل فقط إذا كان الطلب معلقاً
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> تعديل الطلب
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal لعرض الصورة بحجم كامل -->
+@if (!string.IsNullOrEmpty(Model.DepositPhoto))
+{
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">صورة الإيداع</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center bg-dark">
+                    <img src="@Model.DepositPhoto" class="img-fluid" alt="Full Size Receipt">
+                </div>
+            </div>
+        </div>
+    </div>
+}

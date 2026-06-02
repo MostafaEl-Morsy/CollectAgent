@@ -1,0 +1,198 @@
+﻿@model DatabaseAccess.Models.TblDrwerTransAction
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TblDrwerTransAction</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RefCode)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RefCode)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own500)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own500)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own200)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own200)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own100)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own100)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own50)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own50)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own20)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own20)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own10)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own10)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Own5)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Own5)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TtlAmntOwned)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TtlAmntOwned)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le500)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le500)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le200)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le200)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le100)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le100)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le50)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le50)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le20)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le20)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le10)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le10)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Le5)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Le5)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TtlAmntTrnsAct)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TtlAmntTrnsAct)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After500)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After500)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After200)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After200)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After100)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After100)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After50)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After50)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After20)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After20)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After10)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After10)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.After5)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.After5)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TtlAmntAfter)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TtlAmntAfter)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TransDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TransDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DateAndTime)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DateAndTime)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DrawerIdFkNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DrawerIdFkNavigation.Code)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TransType)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TransType.TransTypeName)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

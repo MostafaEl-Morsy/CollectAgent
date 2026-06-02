@@ -1,0 +1,213 @@
+﻿@model DatabaseAccess.Models.TblServProvReg
+
+@{
+    ViewData["Title"] = "تفاصيل المحفظة";
+}
+
+<!-- هيدر الصفحة مع حالة المحفظة -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card @(Model.IsActive ? "card-success" : "card-danger") card-outline shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="d-flex align-items-center">
+                        <!-- أيقونة المحفظة الكبيرة -->
+                        <div class="@(Model.IsActive ? "bg-success" : "bg-danger") rounded-circle p-3 me-3">
+                            <i class="fas fa-wallet fa-2x text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 fw-bold">@Model.Code</h3>
+                            <span class="text-muted">
+                                <i class="fas fa-mobile-alt me-1"></i> @Model.ServNo
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                                <i class="fas fa-check-circle me-1"></i> محفظة فعّالة
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6 px-3 py-2">
+                                <i class="fas fa-times-circle me-1"></i> محفظة متوقفة
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- صناديق الإحصائيات -->
+<div class="row mb-4">
+    <!-- الرصيد الحالي -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="info-box shadow-sm">
+            <span class="info-box-icon bg-success"><i class="fas fa-coins"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">الرصيد الحالي</span>
+                <!-- ✅ تصحيح: التعامل مع الرصيد كرقم مباشرة -->
+                <span class="info-box-number fs-4">
+                    @((Model.Balance ?? 0).ToString("N2")) <small>ج.م</small>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- مزود الخدمة -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="info-box shadow-sm">
+            <span class="info-box-icon bg-info"><i class="fas fa-building"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">مزود الخدمة</span>
+                <span class="info-box-number">@Model.ServProvFkNavigation?.ProviderName</span>
+                <small class="text-muted">@Model.ServProvFkNavigation?.ProviderCode</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- تاريخ التفعيل -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="info-box shadow-sm">
+            <span class="info-box-icon bg-warning"><i class="fas fa-calendar-check"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">تاريخ التفعيل</span>
+                <!-- ✅ تصحيح: إزالة تنسيق الوقت لأن النوع DateOnly -->
+                <span class="info-box-number">@Model.StartDate?.ToString("yyyy/MM/dd")</span>
+                <small class="text-muted">@Model.StartDate?.ToString("dddd", new System.Globalization.CultureInfo("ar-EG"))</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- كارت التفاصيل الكاملة -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary card-outline shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title fw-bold">
+                    <i class="fas fa-info-circle text-primary me-2"></i> معلومات المحفظة
+                </h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <tbody>
+                        <tr>
+                            <th style="width: 200px;">
+                                <i class="fas fa-hashtag text-muted me-2"></i> كود المحفظة
+                            </th>
+                            <td class="fw-bold">@Model.Code</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-mobile-alt text-muted me-2"></i> رقم المحفظة
+                            </th>
+                            <td>
+                                <span class="badge bg-secondary fs-6">@Model.ServNo</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-building text-muted me-2"></i> مزود الخدمة
+                            </th>
+                            <td>
+                                <span class="badge bg-info">@Model.ServProvFkNavigation?.ProviderName</span>
+                                <small class="text-muted ms-2">(@Model.ServProvFkNavigation?.ProviderCode)</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-money-bill-wave text-muted me-2"></i> الرصيد
+                            </th>
+                            <td>
+                                <!-- ✅ تصحيح: التعامل مع الرصيد كرقم مباشرة -->
+                                <span class="fs-5 fw-bold text-success">@((Model.Balance ?? 0).ToString("N2"))</span>
+                                <small class="text-muted">جنيه مصري</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-calendar-alt text-muted me-2"></i> تاريخ البدء
+                            </th>
+                            <!-- ✅ تصحيح: إزالة hh:mm tt لأن النوع DateOnly -->
+                            <td>@Model.StartDate?.ToString("yyyy/MM/dd")</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-toggle-on text-muted me-2"></i> الحالة
+                            </th>
+                            <td>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i> فعّالة</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger"><i class="fas fa-times me-1"></i> متوقفة</span>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- كارت المستخدم -->
+    <div class="col-md-4">
+        <div class="card card-secondary card-outline shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title fw-bold">
+                    <i class="fas fa-user text-secondary me-2"></i> صاحب المحفظة
+                </h3>
+            </div>
+            <div class="card-body text-center">
+                <!-- صورة المستخدم -->
+                <div class="mb-3">
+                    <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-2x text-white"></i>
+                    </div>
+                </div>
+
+                <!-- اسم المستخدم -->
+                <h5 class="fw-bold mb-1">@Model.UserFkNavigation?.FullName</h5>
+                <p class="text-muted mb-3">
+                    <i class="fas fa-phone me-1"></i> @Model.UserFkNavigation?.ContactNo
+                </p>
+
+                <!-- زر عرض ملف المستخدم -->
+                <a asp-controller="TblUsers" asp-action="Details" asp-route-id="@Model.UserFk"
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-eye me-1"></i> عرض ملف المستخدم
+                </a>
+            </div>
+        </div>
+
+        <!-- كارت الإجراءات السريعة -->
+        <div class="card card-dark card-outline shadow-sm mt-3">
+            <div class="card-header">
+                <h3 class="card-title fw-bold">
+                    <i class="fas fa-bolt text-dark me-2"></i> إجراءات سريعة
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> تعديل البيانات
+                    </a>
+                    @* <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                        <i class="fas fa-trash-alt me-1"></i> حذف المحفظة
+                    </a> *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-1"></i> عودة للقائمة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

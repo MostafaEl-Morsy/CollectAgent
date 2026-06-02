@@ -1,0 +1,82 @@
+﻿@{
+    // تم تحديث العنوان ليناسب الهوية الجديدة
+    ViewData["Title"] = "اختر نوع الإيداع";
+    ViewBag.Lable = "الرئـيسـية";
+    ViewBag.Url = @Url.Action("Index", "Home");
+}
+
+@* 
+    استخدمنا هنا كلاس "choice-grid" من ملف التنسيق الخاص بك.
+    هذا الكلاس سيقوم بترتيب البطاقات تلقائياً بشكل متجاوب (responsive).
+*@
+<div class="choice-grid">
+
+    <!-- البطاقة الأولى: إضافة رصيد -->
+    @*
+        - استخدمنا a asp-action لإنشاء رابط نظيف وصحيح في ASP.NET Core.
+        - asp-route-type="1" لتمرير قيمة النوع إلى الـ Controller.
+        - طبقنا كلاسات التصميم الحديث choice-card-link و choice-card.
+    *@
+    <a asp-controller="TblDepositOrders" asp-action="Create" asp-route-type="1" class="choice-card-link">
+        <div class="choice-card">
+            <div class="choice-card-icon-wrapper bg-success-soft">
+                <i class="fas fa-recycle fa-2x text-success"></i>
+            </div>
+            <div class="choice-card-content">
+                <h3 class="choice-card-title">إضافة رصيد</h3>
+                <p class="choice-card-description">إيداع مباشر في حسابك لزيادة الرصيد.</p>
+            </div>
+        </div>
+    </a>
+
+    @*
+        التحقق من صلاحية المستخدم باستخدام ViewBag.UserType الذي قمنا بتمريره من الـ Controller
+    *@
+    @* @if (ViewBag.UserType < 9)
+    { *@
+        <!-- البطاقة الثانية: حساب شركة -->
+        <a asp-controller="TblDepositOrders" asp-action="Create" asp-route-type="2" class="choice-card-link">
+            <div class="choice-card">
+                <div class="choice-card-icon-wrapper bg-primary-soft">
+                    <i class="fas fa-building fa-2x text-primary"></i>
+                </div>
+                <div class="choice-card-content">
+                    <h3 class="choice-card-title">حساب شركة</h3>
+                    <p class="choice-card-description">إيداع مباشر لحساب أحد مزودي الخدمة.</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- البطاقة الثالثة: تسديد -->
+        <a asp-controller="TblDepositOrders" asp-action="Create" asp-route-type="3" class="choice-card-link">
+            <div class="choice-card">
+                <div class="choice-card-icon-wrapper bg-warning-soft">
+                    <i class="fas fa-user-check fa-2x text-warning"></i>
+                </div>
+                <div class="choice-card-content">
+                    <h3 class="choice-card-title">تـسـديـد</h3>
+                    <p class="choice-card-description">تسديد مديونية تاجر أو شركة أخرى.</p>
+                </div>
+            </div>
+        </a>
+   @*  } *@
+</div>
+
+@section Styles {
+    <link href="~/css/custom-style.css" rel="stylesheet" asp-append-version = "true"/>
+    <style>
+        /* يمكن وضع كود الـ CSS الخاص بالصفحة هنا مباشرة أو التأكد من استدعائه في Layout */
+        /* بما أنك أرفقت ملف CSS كامل، فقط تأكد أنه مربوط بشكل صحيح في ملف _Layout.cshtml */
+        .text-success {
+            color: #198754 !important;
+        }
+
+        .text-primary {
+            color: #0d6efd !important;
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+        }
+    </style>
+}

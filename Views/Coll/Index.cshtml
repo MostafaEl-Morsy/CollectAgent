@@ -1,0 +1,123 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblAccount>
+@{
+    ViewBag.Title = "التحصيل";
+    ViewBag.Lable = "الرئـيسـية";
+    ViewBag.Url = @Url.Action("SwitchAction", "Home");
+}
+
+@section Styles{
+    <link href="~/css/custom-style.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="card card-flat">
+    <div class="card-header-actions">
+        <h4 class="mb-0">@ViewBag.Title</h4>
+        <input type="text" id="search" placeholder="ابحث باسم المتجر..." class="form-control search-input" style="max-width: 300px;" />
+    </div>
+
+    <div class="card-body p-0">
+        <div class="user-grid" id="all">
+            @foreach (var item in Model)
+            {
+                // URLs for actions, using the user ID from the related table
+                var collectUrl = Url.Action("Create", "Coll", new { id = item.UserIdFk });
+                var transferUrl = Url.Action("BalanceTransfer", "TblOrders", new { id = item.UserIdFk });
+
+                // --== [بداية التعديل] ==--
+                // 1. تحديد الـ classes بناءً على قيمة المديونية (هذا الجزء صحيح وممتاز)
+                var cardClass = "";
+                var textClass = "";
+
+                if (item.Indebtedness < 0)
+                {
+                    // التاجر مديون لك (قيمة سالبة)
+                    cardClass = "card-negative"; // كلاس الكارت ليكون مميز باللون الأحمر
+                    textClass = "text-danger";   // كلاس النص ليكون باللون الأحمر
+                }
+                else
+                {
+                    // أنت مديون للتاجر أو الرصيد صفر (قيمة موجبة أو صفر)
+                    cardClass = "card-positive"; // كلاس الكارت ليكون مميز باللون الأخضر
+                    textClass = "text-success";  // كلاس النص ليكون باللون الأخضر
+                }
+                // --== [نهاية التعديل] ==--
+
+                // 2. تطبيق الـ class المحدد على الكارت مع الهيكل الجديد
+                <div class="user-card @cardClass">
+
+                    @* تم تغيير اسم الحاوية لتكون أكثر وضوحاً *@
+                    <div class="user-card-header">
+                        @* 1. اسم المالك (موجود سابقاً) *@
+                        @* إضافة اسم المحل ليظهر للمستخدم وليتمكن كود البحث من قراءته *@
+                        @* تأكد أن اسم الخاصية في الداتابيز هو UserName، إذا كان مختلفاً غيره هنا *@
+                        @if (!string.IsNullOrEmpty(item.UserIdFkNavigation.UserCode))
+                        {
+                        <h5 class="user-shop-name">@item.UserIdFkNavigation.UserCode</h5>
+
+                        @* 2. === [الإضافة الضرورية] === *@
+                            <span class="d-block text-muted small mb-2">
+                                <i class="fa fa-building-o"></i> @item.UserIdFkNavigation.FullName
+                            </span>
+                        }
+
+                        @* 3. المديونية (موجودة سابقاً) *@
+                        <p class="user-indebtedness">
+                            المديونية:
+                            <span class="amount @textClass">
+                                @Html.DisplayFor(modelItem => item.Indebtedness)
+                            </span>
+                        </p>
+                    </div>
+
+                    <div class="user-card-actions">
+                        <a href="@transferUrl" class="btn btn-sm btn-purple">
+                            <i class="fa fa-exchange"></i> تحـويل
+                        </a>
+                        <a href="@collectUrl" class="btn btn-sm btn-primary">
+                            <i class="fa fa-hand-paper-o"></i> تحـصـيل
+                        </a>
+                    </div>
+                </div>
+            }
+            <!--<div class="ml-auto">
+            <a href="@Url.Action("ExportToExcel", "Coll")" class="btn btn-success" target="_blank">-->
+            @* <-- إضافة target="_blank" هنا *@
+            <!--<i class="fa fa-file-excel-o"></i> تصدير إلى Excel
+                </a>
+            </div>-->
+            <div class="ml-auto">
+                @* تغيير الرابط إلى زر أو إضافة id *@
+                <button id="exportBtn" class="btn btn-success">
+                    <i class="fa fa-file-excel-o"></i> تصدير إلى Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Updated search function to work on the new card layout
+            $("#search").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                // Filter user cards instead of list items
+                $("#all .user-card").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            // --== [بداية الإضافة: كود التصدير للموبايل] ==--
+            $("#exportBtn").on("click", function (e) {
+                e.preventDefault(); // منع أي سلوك افتراضي للزر
+
+                // الحصول على الرابط من الكنترولر
+                var exportUrl = "@Url.Action("ExportToExcel", "Coll")";
+
+                // الطريقة المباشرة والأكثر توافقية
+                window.location.href = exportUrl;
+            });
+            // --== [نهاية الإضافة] ==--
+        });
+    </script>
+}

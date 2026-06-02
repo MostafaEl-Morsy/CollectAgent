@@ -1,0 +1,119 @@
+﻿@model DatabaseAccess.Models.TblServTrnx
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TblServTrnx</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ReferenceCode" class="control-label"></label>
+                <input asp-for="ReferenceCode" class="form-control" />
+                <span asp-validation-for="ReferenceCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SenderUserId" class="control-label"></label>
+                <select asp-for="SenderUserId" class="form-control" asp-items="ViewBag.SenderUserId"></select>
+                <span asp-validation-for="SenderUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrRegId" class="control-label"></label>
+                <select asp-for="SendrRegId" class="form-control" asp-items="ViewBag.SendrRegId"></select>
+                <span asp-validation-for="SendrRegId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecvrUserId" class="control-label"></label>
+                <select asp-for="RecvrUserId" class="form-control" asp-items="ViewBag.RecvrUserId"></select>
+                <span asp-validation-for="RecvrUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlncAmntOrderTrx" class="control-label"></label>
+                <input asp-for="BlncAmntOrderTrx" class="form-control" />
+                <span asp-validation-for="BlncAmntOrderTrx" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrBlncBfr" class="control-label"></label>
+                <input asp-for="SendrBlncBfr" class="form-control" />
+                <span asp-validation-for="SendrBlncBfr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SendrBlncAftr" class="control-label"></label>
+                <input asp-for="SendrBlncAftr" class="form-control" />
+                <span asp-validation-for="SendrBlncAftr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransDate" class="control-label"></label>
+                <input asp-for="TransDate" class="form-control" />
+                <span asp-validation-for="TransDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateAndTime" class="control-label"></label>
+                <input asp-for="DateAndTime" class="form-control" />
+                <span asp-validation-for="DateAndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OrderNo" class="control-label"></label>
+                <input asp-for="OrderNo" class="form-control" />
+                <span asp-validation-for="OrderNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ServProdFk" class="control-label"></label>
+                <select asp-for="ServProdFk" class="form-control" asp-items="ViewBag.ServProdFk"></select>
+                <span asp-validation-for="ServProdFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerNoTrx" class="control-label"></label>
+                <input asp-for="CustomerNoTrx" class="form-control" />
+                <span asp-validation-for="CustomerNoTrx" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SellPriceTrx" class="control-label"></label>
+                <input asp-for="SellPriceTrx" class="form-control" />
+                <span asp-validation-for="SellPriceTrx" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FeesTrx" class="control-label"></label>
+                <input asp-for="FeesTrx" class="form-control" />
+                <span asp-validation-for="FeesTrx" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalPriceTrx" class="control-label"></label>
+                <input asp-for="TotalPriceTrx" class="form-control" />
+                <span asp-validation-for="TotalPriceTrx" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CnfrmNumOrPic" class="control-label"></label>
+                <input asp-for="CnfrmNumOrPic" class="form-control" />
+                <span asp-validation-for="CnfrmNumOrPic" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StatusFk" class="control-label"></label>
+                <select asp-for="StatusFk" class="form-control" asp-items="ViewBag.StatusFk"></select>
+                <span asp-validation-for="StatusFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

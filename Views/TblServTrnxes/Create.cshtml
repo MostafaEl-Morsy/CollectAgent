@@ -1,0 +1,313 @@
+﻿@model CollectAgent.ViewModels.ServTrnxCreateViewModel
+
+@{
+    ViewData["Title"] = "تنفيذ عملية";
+    // تحديد إذا كانت العملية كاش (لا يوجد تاجر)
+    bool isCash = (Model.MerchantId == 0);
+    // تحديد نوع العملية (1=إيداع، 2=سحب)
+    int prodType = Model.ProductType;
+}
+
+<form asp-action="Create"
+      asp-route-productId="@Model.ServProdFk"
+      asp-route-merchantId="@(Model.MerchantId == 0 ? null : Model.MerchantId)"
+      method="post"
+      id="transactionForm">
+
+    <!-- Hidden Fields -->
+    <input asp-for="ServProdFk" type="hidden" />
+    <input asp-for="SenderUserId" type="hidden" />
+    <input asp-for="MerchantId" type="hidden" />
+    <input asp-for="ProductType" type="hidden" id="productType" />
+
+    <!-- حقول مساعدة للجافاسكربت -->
+    <input type="hidden" id="isCashSale" value="@(isCash ? "true" : "false")" />
+    <input type="hidden" id="initialDebt" value="@Model.IndebtBefore" />
+
+    <!-- الحاوية الرئيسية مع استخدام تنسيقات البوتستراب لضمان عدم كسر التصميم -->
+    <div class="card shadow-sm border-0 rounded-4 mx-auto my-4" style="max-width: 550px;">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+
+            <!-- Header Section -->
+            <div class="text-center border-bottom pb-3 mb-2">
+                <h4 class="text-warning fw-bold mb-3">@ViewBag.ShopName</h4>
+
+                <div class="d-flex justify-content-center align-items-center gap-3 mb-2">
+                    @{
+                        var logoPath = ViewBag.ProviderLogoUrl as string;
+                        if (!string.IsNullOrEmpty(logoPath))
+                        {
+                            logoPath = "/" + logoPath.Replace("~", "").TrimStart('/');
+                            <img src="@Url.Content(logoPath)" class="rounded-circle shadow-sm" width="55" height="55" style="object-fit: contain; background:#fff; padding:3px;" onerror="this.style.display='none'" alt="Provider Logo" />
+                        }
+                    }
+                    <h5 class="m-0 fw-bold fs-4">@ViewBag.ProviderName</h5>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-info text-dark fs-6 px-3 py-2 rounded-pill shadow-sm">@ViewBag.ProductName</span>
+                    <span class="badge @(prodType == 1 ? "bg-success" : "bg-danger") fs-6 px-3 py-2 rounded-pill shadow-sm">
+                        <i class="fa @(prodType == 1 ? "fa-arrow-down" : "fa-arrow-up") me-1"></i>
+                        @(prodType == 1 ? "إيداع / شحن" : "سحب / كاش أوت")
+                    </span>
+                </div>
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3"></div>
+
+            <!-- رقم الموبايل / الحساب -->
+            <div class="form-group bg-light p-3 rounded-3 border">
+                <label asp-for="CustomerNoTrx" class="form-label fw-bold text-dark mb-2">
+                    <i class="fa fa-phone fa-flip-horizontal text-muted"></i> رقم الموبايل / الحساب
+                </label>
+                <!-- استخدام dir="ltr" مهم جداً للأرقام -->
+                <input asp-for="CustomerNoTrx" dir="ltr" class="form-control form-control-lg text-center fw-bold fs-4 tracking-wide" type="tel" placeholder="01xxxxxxxxx" required autocomplete="off" />
+                <span asp-validation-for="CustomerNoTrx" class="text-danger d-block mt-1"></span>
+            </div>
+
+            <div class="row g-3">
+                <!-- خانة 1: قيمة الرصيد -->
+                <div class="col-md-6">
+                    <div class="form-group border border-primary border-opacity-25 rounded-3 p-3 h-100 bg-white">
+                        <label asp-for="BlncAmntOrderTrx" class="form-label fw-bold text-primary mb-2 d-block">
+                            <i class="fa fa-sim-card"></i> رصيد المحفظة
+                        </label>
+                        <input asp-for="BlncAmntOrderTrx" id="walletAmountInput" dir="ltr" class="form-control form-control-lg text-center fw-bold" type="number" placeholder="0" required min="1" />
+                        <span asp-validation-for="BlncAmntOrderTrx" class="text-danger d-block mt-1"></span>
+                        <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">المبلغ المخصوم/المضاف للمحفظة</small>
+                    </div>
+                </div>
+
+                <!-- خانة 2: السعر المطلوب -->
+                <div class="col-md-6">
+                    <div class="form-group border border-success border-opacity-25 rounded-3 p-3 h-100 bg-white">
+                        <label asp-for="TotalPriceTrx" class="form-label fw-bold text-success mb-2 d-block">
+                            <i class="fa fa-money-bill-wave"></i> المبلغ المستحق
+                        </label>
+                        <input asp-for="TotalPriceTrx" id="payAmountInput" dir="ltr" class="form-control form-control-lg text-center fw-bold" type="number" placeholder="0" required min="1" />
+                        <span asp-validation-for="TotalPriceTrx" class="text-danger d-block mt-1"></span>
+                        <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">حركة الكاش أو المديونية الفعلية</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === Cash Section (Only for Cash Sales) === -->
+            @if (isCash)
+            {
+                <div id="cash-section" class="bg-white p-3 rounded-3 border border-2 border-secondary border-opacity-25 mt-2 shadow-sm">
+                    <h5 class="text-center mb-3 text-primary border-bottom pb-2 fw-bold">
+                        <i class="fa fa-cash-register"></i> تفاصيل النقدية (الدرج)
+                        <small class="d-block text-muted fs-6 mt-1 fw-normal">
+                            @(prodType == 1 ? "(استلام من العميل - وارد)" : "(تسليم للعميل - منصرف)")
+                        </small>
+                    </h5>
+
+                    <div class="denominations-grid mt-3">
+                        @{
+                            var denominations = new[] {
+                                        new { Val = 200, Prop = "Le200", Max = Model.Le200 ?? 0 },
+                                        new { Val = 100, Prop = "Le100", Max = Model.Le100 ?? 0 },
+                                        new { Val = 50,  Prop = "Le50",  Max = Model.Le50 ?? 0 },
+                                        new { Val = 20,  Prop = "Le20",  Max = Model.Le20 ?? 0 },
+                                        new { Val = 10,  Prop = "Le10",  Max = Model.Le10 ?? 0 },
+                                        new { Val = 5,   Prop = "Le5",   Max = Model.Le5 ?? 0 }
+                                        };
+                        }
+
+                        @foreach (var d in denominations)
+                        {
+                            <div class="row align-items-center mb-2 denomination-row" data-val="@d.Val">
+                                <div class="col-3 col-sm-2 text-center">
+                                    <span class="badge bg-secondary w-100 py-2 fs-6">@d.Val ج</span>
+                                    @if (prodType == 2)
+                                    {
+                                        <small class="d-block text-muted mt-1" style="font-size: 11px;">متاح:@d.Max</small>
+                                    }
+                                </div>
+                                <div class="col-6 col-sm-7">
+                                    <div class="input-group input-group-sm">
+                                        <button type="button" class="btn btn-outline-danger btn-stepper minus px-3 fw-bold fs-5">-</button>
+                                        <input type="number" name="@d.Prop" dir="ltr"
+                                               class="form-control text-center denom-input fw-bold fs-5"
+                                               value="0" min="0"
+                                               data-max="@(prodType == 2 ? d.Max : 9999)" />
+                                        <button type="button" class="btn btn-outline-success btn-stepper plus px-3 fw-bold fs-5">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-end">
+                                    <span class="text-dark fw-bold subtotal fs-5">0</span> <small class="text-muted">ج.م</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="alert alert-info mt-4 mb-2 d-flex justify-content-between align-items-center rounded-3">
+                        <strong class="fs-5">إجمالي الدرج:</strong>
+                        <strong id="totalCashDisplay" class="fs-4 text-primary" dir="ltr">0 ج.م</strong>
+                        <input type="hidden" asp-for="TotlMoneyTranact" id="totalCashInput" />
+                    </div>
+
+                    <div id="cashMismatchError" class="alert alert-danger d-none text-center rounded-3 mb-0">
+                        <i class="fa fa-exclamation-triangle"></i> إجمالي النقدية يجب أن يساوي المبلغ المستحق!
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- === Debt Section (Only for Merchant/Debt Sales) === -->
+                <div class="totals-summary mt-2 p-4 border border-2 rounded-3 bg-light shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted fw-bold fs-6">المديونية الحالية:</span>
+                        <span class="badge bg-secondary fs-6 px-3 py-2" dir="ltr">@Model.IndebtBefore.ToString("N0") ج.م</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <span class="text-primary fw-bold fs-5">المديونية بعد العملية:</span>
+                        <span class="badge bg-primary fs-5 px-3 py-2" id="debtAfterDisplay" dir="ltr">@Model.IndebtBefore.ToString("N0") ج.م</span>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted fw-bold px-3 py-1 rounded bg-white border">
+                            <i class="fa @(prodType == 1 ? "fa-arrow-up text-danger" : "fa-arrow-down text-success")"></i>
+                            @(prodType == 1 ? "هذه العملية ستزيد المديونية" : "هذه العملية ستقلل المديونية")
+                        </small>
+                    </div>
+                </div>
+            }
+
+            <!-- Submit Button -->
+            <div class="mt-4 pt-2">
+                <button type="submit" id="submitBtn" class="btn btn-success btn-lg w-100 py-3 fw-bold fs-4 rounded-3 shadow">
+                    <i class="fa fa-check-circle me-2"></i> تأكيد وتـنـفـيـذ الـعـمـلـيـة
+                </button>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // === تعريف المتغيرات ===
+            const walletInput = $('#walletAmountInput');
+            const payInput = $('#payAmountInput');
+            const isCash = $('#isCashSale').val() === 'true';
+            const productType = parseInt($('#productType').val()); // 1=إيداع, 2=سحب
+            const initialDebt = parseFloat($('#initialDebt').val()) || 0;
+            const submitBtn = $('#submitBtn');
+
+            // === إخفاء الصفر عند النقر وإعادته عند المغادرة (التحسين الجديد) ===
+            $('input[type="number"]').on('focus', function () {
+                if ($(this).val() === '0') {
+                    $(this).val(''); // إفراغ الحقل إذا كان يحتوي على صفر فقط
+                }
+            }).on('blur', function () {
+                if ($(this).val() === '') {
+                    $(this).val('0'); // إعادة الصفر إذا ترك المستخدم الحقل فارغاً
+                    $(this).trigger('input'); // تشغيل الحسابات لتحديث الإجماليات
+                }
+            });
+
+            // === 1. التعامل مع أزرار الزيادة والنقصان (+ / -) ===
+            $('.btn-stepper').off('click').on('click', function () {
+                const input = $(this).siblings('input.denom-input');
+                let val = parseInt(input.val()) || 0;
+                const max = parseInt(input.data('max'));
+
+                if ($(this).hasClass('plus')) {
+                    if (productType === 2 && val >= max) {
+                        alert('عفواً، لا يوجد المزيد من هذه الفئة في الدرج.');
+                        return;
+                    }
+                    val++;
+                } else {
+                    if (val > 0) val--;
+                }
+                input.val(val).trigger('input');
+            });
+
+            // === 2. التعامل مع الكتابة اليدوية ===
+            $('.denom-input').on('input change', function () {
+                const input = $(this);
+                let val = parseInt(input.val());
+                const max = parseInt(input.data('max'));
+
+                // السماح بأن يكون الحقل فارغاً أثناء الكتابة (يتم التعامل معه كصفر في العمليات الحسابية)
+                if (isNaN(val) || val < 0) {
+                    val = 0;
+                }
+
+                if (productType === 2 && val > max) {
+                    alert('عفواً، الحد الأقصى المتاح من هذه الفئة هو: ' + max);
+                    input.val(max);
+                }
+
+                calculateCash();
+            });
+
+            // === 3. نسخ القيمة تلقائياً للمبلغ المطلوب ===
+            walletInput.on('input', function () {
+                const val = $(this).val();
+                // فقط انسخ إذا كان حقل المبلغ المطلوب فارغ أو صفر
+                if (payInput.val() === '' || parseFloat(payInput.val()) === 0) {
+                    payInput.val(val).trigger('input');
+                }
+            });
+
+            // === 4. عند تغيير السعر ===
+            payInput.on('input', function () {
+                const payAmount = parseFloat($(this).val()) || 0;
+                if (isCash) {
+                    checkCashMatch();
+                } else {
+                    let debtAfter = 0;
+                    if (productType === 1) debtAfter = initialDebt + payAmount;
+                    else debtAfter = initialDebt - payAmount;
+                    $('#debtAfterDisplay').text(debtAfter.toLocaleString('en-US') + ' ج.م');
+                }
+            });
+
+            // === 5. دالة حساب الإجمالي ===
+            function calculateCash() {
+                let total = 0;
+                $('.denomination-row').each(function () {
+                    const row = $(this);
+                    const val = parseInt(row.data('val'));
+                    const input = row.find('.denom-input');
+                    const count = parseInt(input.val()) || 0; // إذا كان الحقل فارغاً سيعتبره 0
+
+                    const sub = val * count;
+                    row.find('.subtotal').text(sub.toLocaleString('en-US'));
+                    total += sub;
+                });
+
+                $('#totalCashDisplay').text(total.toLocaleString('en-US') + ' ج.م');
+                $('#totalCashInput').val(total);
+                checkCashMatch();
+            }
+
+            // === 6. دالة التحقق وتفعيل زر الحفظ ===
+            function checkCashMatch() {
+                const payAmount = parseFloat(payInput.val()) || 0;
+                const cashCollected = parseFloat($('#totalCashInput').val()) || 0;
+
+                if (payAmount > 0 && payAmount !== cashCollected) {
+                    $('#cashMismatchError').removeClass('d-none');
+                    $('#cashMismatchError').html(`<b>تنبيه:</b> إجمالي النقدية في الدرج (${cashCollected}) لا يساوي المبلغ المستحق (${payAmount})!`);
+                    submitBtn.prop('disabled', true);
+                } else {
+                    $('#cashMismatchError').addClass('d-none');
+                    submitBtn.prop('disabled', false); // تفعيل الزر
+                }
+            }
+
+            // تشغيل الحسابات لأول مرة عند تحميل الصفحة لتجهيز القيم المبدئية
+            if(isCash) calculateCash();
+        });
+    </script>
+}

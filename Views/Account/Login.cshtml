@@ -1,0 +1,97 @@
+﻿@* Views/Account/Login.cshtml *@
+@model CollectAgent.Models.LoginViewModel
+@{
+    Layout = null; // لا نستخدم الـ Layout الرئيسي هنا
+    ViewData["Title"] = "تسجيل الدخول";
+}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] | نظام تحصيل</title>
+
+    <!-- Google Font: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    <!-- Custom Login Style -->
+    <link rel="stylesheet" href="~/css/login-style.css" asp-append-version="true" />
+</head>
+<body class="login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="#"><b>نظام</b> تحصيل</a>
+            <p class="login-subtitle">مرحباً بك في نظام إدارة المدفوعات</p>
+        </div>
+        <div class="card shadow-soft">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">سجل الدخول لبدء الجلسة</p>
+
+                <form asp-action="Login" method="post">
+                    @* لعرض رسائل الخطأ العامة *@
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger-custom"></div>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="Username" class="form-control" placeholder="اسم المستخدم">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Username" class="text-danger d-block mb-2"></span>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="Password" class="form-control" placeholder="كلمة المرور">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger d-block mb-2"></span>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block w-100">تسجيل الدخول <i class="fas fa-arrow-left"></i></button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div class="login-footer">
+            &copy; @DateTime.Now.Year - جميع الحقوق محفوظة
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 👇👇 أضف هذا الكود هنا 👇👇 -->
+    <script>
+        $(document).ready(function () {
+            $('form').on('submit', function (e) {
+                var btn = $(this).find('button[type="submit"]');
+
+                // التأكد من أن الـ Form صالحة (Validation) قبل التعطيل
+                if ($(this).valid ? $(this).valid() : true) {
+                    // إذا كان الزر معطلاً بالفعل، امنع الإرسال مرة أخرى
+                    if (btn.prop('disabled')) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    // تعطيل الزر وتغيير النص
+                    btn.prop('disabled', true);
+                    btn.html('<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...');
+                }
+            });
+        });
+    </script>
+    <!-- 👆👆 نهاية الكود المضاف 👆👆 -->
+</body>
+</html>

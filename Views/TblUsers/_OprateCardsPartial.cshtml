@@ -1,0 +1,34 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblUser>
+
+@foreach (var item in Model)
+{
+    <div class="user-card">
+        <div class="user-card-header">
+            <h5 class="user-shop-name">@item.FullName</h5> @* عرض الاسم الكامل أفضل من الكود *@
+            <p class="user-full-name">@item.ContactNo</p>
+        </div>
+
+        <div class="user-card-actions">
+            <!-- 1. تحويل الرصيد -->
+            <a asp-controller="TblOrders" asp-action="BalanceTransfer" asp-route-id="@item.Id" class="btn btn-purple">
+                <i class="fas fa-exchange-alt"></i> تحـويل
+            </a>
+            <!-- 2. تحصيل -->
+            <a asp-controller="Coll" asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary">
+                <i class="fas fa-hand-holding-usd"></i> تحـصـيل
+            </a>
+            <!-- 3. توريد -->
+            <a asp-controller="TblDebtTrnsActs" asp-action="Create" asp-route-id="@item.Id" class="btn btn-info">
+                <i class="fas fa-dolly-flatbed"></i> تـوريد
+            </a>
+            <!-- 4. كشف حساب -->
+            <a asp-controller="TblDebtTrnsActs" asp-action="Index" asp-route-id="@item.Id" class="btn btn-danger">
+                <i class="fas fa-file-invoice-dollar"></i> كشف حساب
+            </a>
+            <!-- 5. شحن خدمات -->
+            <a asp-controller="TblServProducts" asp-action="ServIndex" asp-route-id="@item.Id" class="btn btn-warning">
+                <i class="fas fa-bolt"></i> شحـن خدمـات
+            </a>
+        </div>
+    </div>
+}

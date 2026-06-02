@@ -1,0 +1,59 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "شحـن الخدمات";
+    ViewBag.Lable = "الرئـيسـية"; // رابط العودة للقائمة الرئيسية
+    ViewBag.Url = Url.Action("SwitchAction", "Home");
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/custom-style.css" />
+}
+
+@{
+    // نسترجع القيمة من ViewData
+    var merchantId = ViewData["MerchantId"];
+
+    // لقد قمت بتغيير اسم الكنترولر إلى ServProducts حسب الحل السابق
+    var cashWalletUrl = Url.Action("Wallet", "TblServProducts", new { @provType = 3, merchantId = merchantId });
+    var bankWalletUrl = Url.Action("Wallet", "TblServProducts", new { @provType = 4, merchantId = merchantId });
+}
+
+<!-- رسالة النجاح المحسّنة -->
+@if (TempData["Success"] != null && !string.IsNullOrEmpty(TempData["Success"].ToString()))
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="fa fa-check-circle me-2"></i>
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- تصميم شبكي عصري للبطاقات -->
+<div class="choice-grid">
+    <!-- بطاقة محافظ الكاش -->
+    <a href="@cashWalletUrl" class="choice-card-link">
+        <div class="choice-card">
+            <div class="choice-card-icon-wrapper bg-success-soft">
+                <i class="fas fa-wallet fa-3x text-success"></i>
+            </div>
+            <div class="choice-card-content">
+                <h4 class="choice-card-title">محافظ الكاش</h4>
+                <p class="choice-card-description">لعمليات الشحن من المحافظ النقدية</p>
+            </div>
+        </div>
+    </a>
+
+    <!-- بطاقة محافظ بنكية -->
+    <a href="@bankWalletUrl" class="choice-card-link">
+        <div class="choice-card">
+            <div class="choice-card-icon-wrapper bg-warning-soft">
+                <i class="fas fa-university fa-3x text-warning"></i>
+            </div>
+            <div class="choice-card-content">
+                <h4 class="choice-card-title">محافظ بنكية</h4>
+                <p class="choice-card-description">لعمليات الشحن من حسابات البنوك</p>
+            </div>
+        </div>
+    </a>
+    <!-- يمكنك إضافة المزيد من البطاقات هنا بنفس النمط -->
+</div>

@@ -1,0 +1,76 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblBlncTrnsAct>
+@using System.Globalization
+
+@foreach (var item in Model)
+{
+    int currentUserId = ViewBag.CurrentUserId as int? ?? 0;
+    bool isSender = item.SendrUserId == currentUserId;
+
+    string relationLabel = isSender ? "إلى المحل:" : "من المحل:";
+    var otherPartyName = isSender ? item.RecvrUser?.UserCode : item.SendrUser?.UserCode;
+
+    // ✅ التعديل هنا: جلب اسم مزود الخدمة من الجدول المرتبط
+    // ⚠️ تنبيه: قم بتغيير 'ProviderName' إلى اسم الحقل الفعلي في جدول المزودين لديك (مثلاً Name أو NameAr)
+    var myServiceProvider = isSender
+        ? item.SendrReg?.ProviderFkNavigation?.ProviderName
+        : item.RecvrReg?.ProviderFkNavigation?.ProviderName;
+
+    var myBalanceBefore = isSender ? item.SendrBlncBfr : item.RecvrBlncBfr;
+    var myBalanceAfter = isSender ? item.SendrBlncAftr : item.RecvrBlncAftr;
+
+    bool isMoneyOut = isSender;
+
+    <div class="transaction-card">
+        <!-- الأيقونة -->
+        <div class="transaction-icon">
+            @if (isMoneyOut)
+            {
+                <i class="fas fa-arrow-up text-danger" title="صادر"></i>
+            }
+            else
+            {
+                <i class="fas fa-arrow-down text-success" title="وارد"></i>
+            }
+        </div>
+
+        <div class="transaction-details" style="flex-grow: 1; padding: 0 10px;">
+            <!-- اسم الطرف الآخر ومزود الخدمة -->
+            <div class="shop-name" style="font-size: 1.1em; font-weight: bold; margin-bottom: 5px; color: #333; display: flex; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <i class="fas fa-store text-primary me-1"></i>
+                    <span class="text-muted" style="font-size: 0.8em;">@relationLabel</span>
+                    <span class="receiver me-2">@otherPartyName</span>
+                </div>
+
+                <!-- عرض اسم مزود الخدمة كـ Badge -->
+                @if (!string.IsNullOrEmpty(myServiceProvider))
+                {
+                    <span class="badge bg-secondary opacity-75" style="font-size: 0.7em; font-weight: normal;" title="مزود الخدمة">
+                        <i class="fas fa-sim-card me-1"></i> @myServiceProvider
+                    </span>
+                }
+            </div>
+
+            <!-- التاريخ والمرجع -->
+            <div class="transaction-meta text-muted" style="font-size: 0.85em; margin-bottom: 8px;">
+                <span>@item.TransDate.ToString("yyyy/MM/dd") - @item.DateAndTime.ToString("hh:mm tt")</span>
+                <span class="mx-1">|</span>
+                <span>مرجع: @item.ReferenceCode</span>
+            </div>
+
+            <!-- أرصدتي أنا فقط -->
+            <div class="transaction-balances" style="font-size: 0.85em; background-color: #f4f6f9; padding: 4px 10px; border-radius: 6px; display: inline-block; border: 1px solid #e9ecef;">
+                <span class="text-muted">الرصيد قبل:</span>
+                <strong style="color: #6c757d;">@((myBalanceBefore ?? 0).ToString("N2", new CultureInfo("en-US")))</strong>
+                <span class="mx-2 text-muted">|</span>
+                <span class="text-muted">الرصيد بعد:</span>
+                <strong class="text-primary">@((myBalanceAfter ?? 0).ToString("N2", new CultureInfo("en-US")))</strong>
+            </div>
+        </div>
+
+        <!-- المبلغ -->
+        <div class="transaction-amount @(isMoneyOut ? "text-danger" : "text-success")" style="font-weight: bold; font-size: 1.2em;">
+            @item.BlncTrnsfr.ToString("N2", new CultureInfo("en-US"))
+        </div>
+    </div>
+}

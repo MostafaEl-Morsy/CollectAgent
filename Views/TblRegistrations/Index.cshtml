@@ -1,0 +1,127 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblRegistration>
+
+@{
+    ViewData["Title"] = "إدارة حسابات POS";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>إضافة حساب جديد
+    </a>
+</div>
+
+<!-- البحث -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="position-relative">
+            <input type="text"
+                   id="searchInput"
+                   class="form-control"
+                   placeholder="ابحث بالاسم، الكود، رقم الهاتف..."
+                   style="padding-left: 2.5rem;" />
+            <i class="fas fa-search position-absolute" style="left: 1rem; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- حاوية البطاقات -->
+<div id="registrationGridContainer" class="row">
+    <partial name="_RegistrationCardsPartial" model="Model" />
+</div>
+
+<!-- مؤشر التحميل -->
+<div id="loading" class="text-center my-4" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">جاري تحميل المزيد...</p>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // ========= منطق التحميل اللامتناهي (Infinite Scroll) =========
+            let page = 2;
+            let isLoading = false;
+            let hasMorePages = @(ViewBag.HasMorePages.ToString().ToLower());
+
+            const scrollHandler = function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 300) {
+                    if (!isLoading && hasMorePages) {
+                        loadMoreRegistrations();
+                    }
+                }
+            };
+
+            $(window).on('scroll', scrollHandler);
+
+            function loadMoreRegistrations() {
+                isLoading = true;
+                $('#loading').show();
+
+                $.ajax({
+                    url: '@Url.Action("GetRegistrations", "TblRegistrations")',
+                    type: 'GET',
+                    data: { page: page },
+                    success: function (data) {
+                        if (data.trim().length > 0) { // <-- إذا كانت هناك بيانات، أضفها
+                            $('#registrationGridContainer').append(data);
+                            page++;
+                        } else { // <-- إذا كانت البيانات فارغة، أوقف التحميل
+                            hasMorePages = false;
+                            $('#loading').hide();
+                        }
+                    },
+                    complete: function () {
+                        isLoading = false;
+                        if (hasMorePages) {
+                            $('#loading').hide();
+                        }
+                    }
+                });
+            }
+
+            // ========= منطق البحث من الخادم (Server-Side Search) =========
+            let searchTimer;
+
+            $('#searchInput').on('keyup', function () {
+                clearTimeout(searchTimer);
+                let searchTerm = $(this).val();
+
+                searchTimer = setTimeout(function () {
+                    if (searchTerm.length > 1) {
+                        performSearch(searchTerm);
+                    } else if (searchTerm.length === 0) {
+                        resetToInitialView();
+                    }
+                }, 500);
+            });
+
+            function performSearch(term) {
+                $(window).off('scroll', scrollHandler);
+                $('#loading').hide();
+                $('#registrationGridContainer').html('<div class="text-center p-5 w-100"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">جاري البحث...</p></div>');
+
+                $.ajax({
+                    url: '@Url.Action("SearchRegistrations", "TblRegistrations")',
+                    type: 'GET',
+                    data: { searchTerm: term },
+                    success: function (data) {
+                        $('#registrationGridContainer').html(data);
+                        if (data.trim().length === 0) {
+                            $('#registrationGridContainer').html('<div class="alert alert-warning text-center w-100">لا توجد نتائج بحث مطابقة.</div>');
+                        }
+                    },
+                    error: function() {
+                        $('#registrationGridContainer').html('<div class="alert alert-danger text-center w-100">حدث خطأ أثناء البحث.</div>');
+                    }
+                });
+            }
+
+            function resetToInitialView() {
+                location.reload();
+            }
+        });
+    </script>
+}

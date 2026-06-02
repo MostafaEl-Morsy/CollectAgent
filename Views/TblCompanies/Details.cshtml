@@ -1,0 +1,103 @@
+﻿@model DatabaseAccess.Models.TblCompany
+
+@{
+    ViewData["Title"] = "تفاصيل الشركة";
+}
+
+<!-- ترويسة الصفحة مع الأزرار -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0 text-dark">
+        <i class="far fa-building text-primary ms-2"></i> تفاصيل الشركة
+    </h3>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning shadow-sm">
+            <i class="fas fa-edit ms-1"></i> تعديل
+        </a>
+        <a asp-action="Index" class="btn btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left ms-1"></i> العودة للقائمة
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- بطاقة المعلومات الأساسية -->
+    <div class="col-md-12">
+        <div class="card card-outline card-primary shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle ms-2"></i> معلومات الشركة الأساسية
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <tbody>
+                            <!-- اسم الشركة -->
+                            <tr>
+                                <th style="width: 25%;" class="bg-light align-middle">
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <td class="align-middle">
+                                    @Html.DisplayFor(model => model.Name)
+                                </td>
+                            </tr>
+
+                            <!-- الشعار (Logo) -->
+                            <tr>
+                                <th class="bg-light align-middle">
+                                    @Html.DisplayNameFor(model => model.Logo)
+                                </th>
+                                <td class="align-middle">
+                                    @* إذا كان الشعار عبارة عن مسار صورة، يمكنك استخدام وسم img *@
+                                    @* <img src="~/uploads/@Model.Logo" alt="Logo" class="img-thumbnail" style="max-height: 80px;" /> *@
+
+                                    @* العرض الحالي للنص كما هو في الكود الأصلي *@
+                                    @Html.DisplayFor(model => model.Logo)
+                                </td>
+                            </tr>
+
+                            <!-- رقم التواصل -->
+                            <tr>
+                                <th class="bg-light align-middle">
+                                    @Html.DisplayNameFor(model => model.ContactNo)
+                                </th>
+                                <td class="align-middle">
+                                    @* dir="ltr" لضمان ظهور الرقم بشكل صحيح *@
+                                    <span dir="ltr" class="d-inline-block">@Html.DisplayFor(model => model.ContactNo)</span>
+                                </td>
+                            </tr>
+
+                            <!-- حالة التفعيل -->
+                            <tr>
+                                <th class="bg-light align-middle">
+                                    @Html.DisplayNameFor(model => model.IsActive)
+                                </th>
+                                <td class="align-middle">
+                                    @if (Model.IsActive)
+                                    {
+                                        <span class="badge bg-success rounded-pill px-3 py-2">
+                                            <i class="fas fa-check-circle ms-1"></i> مفعل
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">
+                                            <i class="fas fa-times-circle ms-1"></i> غير مفعل
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>

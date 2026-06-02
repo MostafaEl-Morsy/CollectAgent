@@ -1,0 +1,79 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblProvider>
+
+@{
+    ViewData["Title"] = "اختر مزود الخدمة";
+    // ViewBag.Lable = "الرئـيسـية"; // لم نعد بحاجة لهذه لأن القالب يعالجها
+    // ViewBag.Url = Url.Action("DefaultPage", "Home");
+    var merchantId = ViewData["MerchantId"];
+}
+
+@* 
+  نضيف رابط ملف التنسيق المخصص هنا مباشرةً في الصفحة 
+  حتى لا يؤثر على باقي صفحات المشروع.
+*@
+@section Styles {
+    <link rel="stylesheet" href="~/css/custom-style.css" />
+}
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        // Construct the URL for the action using ViewBag
+        // نستمر في تمرير merchantId
+        var actionUrl = Url.Action("CashBalance", "TblServProducts", new { 
+            senderID = ViewBag.CurrentUserID, 
+            provID = item.Id, 
+            provType = item.ProvTypeFk, 
+            merchantId = merchantId 
+        });
+
+        // Set the provider's main color, with a default fallback color
+        var providerColor = !string.IsNullOrEmpty(item.ProvMainColor) ? item.ProvMainColor : "#6a11cb";
+
+        // نستخدم Bootstrap grid system
+        <div class="col-12 col-md-6 mb-3">
+            <a href="@actionUrl" class="provider-box" style="--main-color: @providerColor;">
+
+                <!-- الجزء الخاص باسم مزود الخدمة -->
+                <div class="provider-title">
+                    <h3>@item.ProviderName</h3>
+                </div>
+
+                <!-- الجزء الخاص بشعار مزود الخدمة -->
+                @* <div class="provider-logo">
+                    @if (!string.IsNullOrEmpty(item.ProviderLogo))
+                    {
+                        <img src="@Url.Content(item.ProviderLogo)" alt="شعار @item.ProviderName" />
+                    }
+                </div> *@
+
+                <div class="provider-logo" style="background: white; border-radius: 8px; padding: 5px; display: flex; justify-content: center; align-items: center; width: 80px; height: 80px;">
+                    @{
+                        // --- بداية التعديل: نسخنا نفس المنطق من الصفحة السليمة ---
+                        var imgPath = item.ProviderLogo;
+                        if (!string.IsNullOrEmpty(imgPath))
+                        {
+                            // تنظيف المسار لضمان عمله
+                            imgPath = "/" + imgPath.Replace("~", "").TrimStart('/');
+                        }
+                        // --------------------------------------------------------
+                    }
+
+                    @if (!string.IsNullOrEmpty(imgPath))
+                    {
+                        // تم إضافة تنسيق للصورة لتظهر بشكل مناسب داخل المربع
+                        <img src="@Url.Content(imgPath)"
+                             alt="شعار @item.ProviderName"
+                             style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                             onerror="this.onerror=null; this.src='/lib/adminlte/assets/img/avatar.png';" />
+                    }
+                    else
+                    {
+                        // صورة احتياطية في حالة عدم وجود شعار
+                        <i class="fas fa-building fa-2x text-secondary"></i>
+                    }
+                </div>
+            </a>
+        </div>
+    }
+</div>

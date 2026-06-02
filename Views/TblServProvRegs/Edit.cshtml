@@ -1,0 +1,215 @@
+﻿@model DatabaseAccess.Models.TblServProvReg
+
+@{
+    ViewData["Title"] = "تعديل بيانات المحفظة";
+}
+
+<!-- ملخص سريع للمحفظة في الأعلى -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="small-box bg-gradient-info shadow-sm">
+            <div class="inner">
+                <h4>@Model.ServNo</h4>
+                <p>رقم المحفظة</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="small-box bg-gradient-success shadow-sm">
+            <div class="inner">
+                <h4>@Model.Balance?.ToString("N2") <small>ج.م</small></h4>
+                <p>الرصيد الحالي</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="small-box @(Model.IsActive == true ? "bg-gradient-primary" : "bg-gradient-danger") shadow-sm">
+            <div class="inner">
+                <h4>@(Model.IsActive == true ? "فعّالة" : "متوقفة")</h4>
+                <p>حالة المحفظة</p>
+            </div>
+            <div class="icon">
+                <i class="fas @(Model.IsActive == true ? "fa-check-circle" : "fa-times-circle")"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- كارت التعديل الرئيسي -->
+<div class="card card-warning card-outline shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title fw-bold">
+            <i class="fas fa-edit text-warning me-2"></i> تعديل بيانات المحفظة
+        </h3>
+        <div class="card-tools">
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-right"></i> عودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <form asp-action="Edit">
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <!-- حقل مخفي للـ ID -->
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <!-- العمود الأيمن -->
+                <div class="col-md-6">
+                    <!-- اختيار المندوب/التاجر -->
+                    <div class="mb-3">
+                        <label asp-for="UserFk" class="form-label fw-bold">
+                            <i class="fas fa-user text-muted me-1"></i> المندوب / التاجر
+                        </label>
+                        <select asp-for="UserFk" class="form-select select2" asp-items="ViewBag.UserFk">
+                            <option value="">-- اختر المندوب --</option>
+                        </select>
+                        <span asp-validation-for="UserFk" class="text-danger small"></span>
+                    </div>
+
+                    <!-- مزود الخدمة -->
+                    <div class="mb-3">
+                        <label asp-for="ServProvFk" class="form-label fw-bold">
+                            <i class="fas fa-building text-muted me-1"></i> مزود الخدمة
+                        </label>
+                        <select asp-for="ServProvFk" class="form-select select2" asp-items="ViewBag.ServProvFk">
+                            <option value="">-- اختر المزود --</option>
+                        </select>
+                        <span asp-validation-for="ServProvFk" class="text-danger small"></span>
+                    </div>
+
+                    <!-- الرصيد -->
+                    <div class="mb-3">
+                        <label asp-for="Balance" class="form-label fw-bold">
+                            <i class="fas fa-money-bill-wave text-muted me-1"></i> الرصيد الحالي
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="Balance" class="form-control" type="number" step="0.01" />
+                            <span class="input-group-text">ج.م</span>
+                        </div>
+                        <span asp-validation-for="Balance" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- العمود الأيسر -->
+                <div class="col-md-6">
+                    <!-- رقم المحفظة -->
+                    <div class="mb-3">
+                        <label asp-for="ServNo" class="form-label fw-bold">
+                            <i class="fas fa-mobile-alt text-muted me-1"></i> رقم المحفظة / الخدمة
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                            <input asp-for="ServNo" class="form-control" />
+                        </div>
+                        <span asp-validation-for="ServNo" class="text-danger small"></span>
+                    </div>
+
+                    <!-- كود مختصر -->
+                    <div class="mb-3">
+                        <label asp-for="Code" class="form-label fw-bold">
+                            <i class="fas fa-tag text-muted me-1"></i> كود مختصر (Alias)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                            <input asp-for="Code" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Code" class="text-danger small"></span>
+                    </div>
+
+                    <!-- تاريخ التفعيل -->
+                    <div class="mb-3">
+                        <label asp-for="StartDate" class="form-label fw-bold">
+                            <i class="fas fa-calendar-alt text-muted me-1"></i> تاريخ التفعيل
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                            <input asp-for="StartDate" class="form-control" type="date"
+                                   value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <span asp-validation-for="StartDate" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حالة التفعيل -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-power-off me-2 text-secondary"></i>
+                                    <span class="fw-bold">حالة المحفظة</span>
+                                    <small class="text-muted d-block">قم بإيقاف المحفظة إذا كنت لا تريد استخدامها مؤقتاً</small>
+                                </div>
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input class="form-check-input" type="checkbox"
+                                           asp-for="IsActive"
+                                           id="IsActiveSwitch"
+                                           style="width: 3em; height: 1.5em;">
+                                    <label class="form-check-label fw-bold" for="IsActiveSwitch" id="statusLabel">
+                                        @(Model.IsActive == true ? "فعّالة" : "متوقفة")
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- أزرار الحفظ والحذف -->
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                @* <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt"></i> حذف المحفظة
+                </a> *@
+                <div>
+                    <a asp-action="Index" class="btn btn-secondary me-2">
+                        <i class="fas fa-times"></i> إلغاء
+                    </a>
+                    <button type="submit" class="btn btn-warning px-4">
+                        <i class="fas fa-save"></i> حـفـظ التعديلات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // تفعيل Select2 للقوائم المنسدلة
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dir: "rtl",
+                language: "ar"
+            });
+
+            // تحديث نص حالة المحفظة عند تغيير السويتش
+            $('#IsActiveSwitch').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#statusLabel').text('فعّالة').removeClass('text-danger').addClass('text-success');
+                } else {
+                    $('#statusLabel').text('متوقفة').removeClass('text-success').addClass('text-danger');
+                }
+            });
+        });
+    </script>
+}

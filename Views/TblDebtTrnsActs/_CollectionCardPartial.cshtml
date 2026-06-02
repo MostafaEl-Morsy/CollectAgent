@@ -1,0 +1,96 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblDebtTrnsAct>
+
+@* التأكد من أن الموديل ليس فارغًا قبل البدء *@
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
+        <div class="card shadow-sm mb-3">
+            @* رأس البطاقة: يحتوي على التاريخ والوقت والرقم المرجعي *@
+            <div class="card-header-clean d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="far fa-clock me-1"></i>
+                    <span dir="ltr">@item.DateAndTime.ToString("yyyy-MM-dd | hh:mm tt")</span>
+                </div>
+                <span class="badge bg-light text-secondary border">
+                    #@item.ReferenceCode
+                </span>
+            </div>
+
+            <div class="p-3">
+                 @* 2. المعلومات الرئيسية: التاجر والمبلغ  *@
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="mb-0 text-muted" style="font-size: 0.8rem;">اسم التاجر</h6>
+                        <div class="merchant-name">
+                            <i class="fas fa-store me-1 text-primary opacity-50"></i>
+                            @(item.AccidColFromFkNavigation?.UserIdFkNavigation?.UserCode ?? "غير معروف")
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <h6 class="mb-0 text-muted" style="font-size: 0.8rem;">المبلغ المحصل</h6>
+                        <div class="amount-highlight d-flex flex-column align-items-end mt-1">
+
+                            @* عرض النقدية دائماً (أو إذا كان كلاهما صفر) *@
+                            @if (item.AmntTrnsAct != 0 || item.BlncTrnsAct == 0)
+                            {
+                                <div>
+                                    <span class="text-success fw-bold" style="font-size: 1.1rem;">@item.AmntTrnsAct.ToString("N2")</span>
+                                    <small style="font-size:0.7rem; color:#858796;">ج.م (نقدي)</small>
+                                </div>
+                            }
+
+                            @* عرض الرصيد فقط إذا كان هناك قيمة في حقل الرصيد *@
+                            @if (item.BlncTrnsAct != 0)
+                            {
+                                <div class="mt-1">
+                                    <span class="text-primary fw-bold" style="font-size: 1.1rem;">@((item.BlncTrnsAct ?? 0).ToString("N2"))</span>
+                                    <small style="font-size:0.7rem; color:#858796;">ج.م (رصيد)</small>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                    @* --- نهاية التعديل --- *@
+                </div>
+
+                @* فاصل خفيف *@
+                <hr class="my-2" style="opacity: 0.1;">
+
+                @* 3. تفاصيل الأرصدة (قبل وبعد) *@
+                <div class="row g-2">
+                    @* بوكس نقدية المندوب *@
+                    <div class="col-6">
+                        <div class="balance-box">
+                            <span class="balance-label"><i class="fas fa-wallet me-1"></i>نقدية المندوب</span>
+                            <div class="balance-flow text-dark">
+                                <span class="text-secondary small">@((item.ColToDbtBfr ?? 0).ToString("N0"))</span>
+                                <i class="fas fa-long-arrow-alt-left arrow-icon text-success"></i>
+                                <span class="text-success">@((item.ColToDbtAftr ?? 0).ToString("N0"))</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* بوكس مديونية التاجر *@
+                    <div class="col-6">
+                        <div class="balance-box">
+                            <span class="balance-label"><i class="fas fa-file-invoice-dollar me-1"></i>مديونية التاجر</span>
+                            <div class="balance-flow text-dark">
+                                <span class="text-secondary small">@((item.ColFrmDbtBefr ?? 0).ToString("N0"))</span>
+                                <i class="fas fa-long-arrow-alt-left arrow-icon text-danger"></i>
+                                <span class="text-danger">@((item.ColfrmDebtAfter ?? 0).ToString("N0"))</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* 4. وصف العملية (اختياري) *@
+                <div class="mt-2 text-end">
+                    <span class="badge bg-light text-muted fw-normal">
+                        <i class="fas fa-info-circle me-1"></i> @item.Description
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+}

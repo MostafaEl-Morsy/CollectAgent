@@ -1,0 +1,190 @@
+﻿@model DatabaseAccess.Models.TblUser
+
+@{
+    ViewData["Title"] = "تفاصيل المستخدم"; // عنوان أكثر وصفًا
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@ViewData["Title"]</h1>
+            </div>
+            <div class="col-sm-6">
+                <div class="float-sm-end">
+                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning btn-sm me-2">
+                        <i class="fas fa-edit me-1"></i> تعديل
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> العودة للقائمة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- بطاقة معلومات أساسية -->
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle me-1"></i> معلومات المستخدم الأساسية
+                </h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">الاسم بالكامل</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.FullName)</dd>
+
+                    <dt class="col-sm-4">رقم التواصل</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.ContactNo)</dd>
+
+                    <dt class="col-sm-4">الـبريـد الالكـترونـي</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Email) ? "غير متوفر" : Html.DisplayFor(model => model.Email))</dd>
+
+                    <dt class="col-sm-4">صـلاحـية المـستـخدم</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.UserTypeFkNavigation.UserTypeName)</dd>
+
+                    <dt class="col-sm-4">مفـعل ؟</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.IsActive == true)
+                        {
+                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> مفعل</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> غير مفعل</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة تفاصيل العنوان -->
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card card-info card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-map-marker-alt me-1"></i> تفاصيل العنوان
+                </h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">العـنوان</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Address) ? "غير متوفر" : Html.DisplayFor(model => model.Address))</dd>
+
+                    <dt class="col-sm-4">الشـارع</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Street) ? "غير متوفر" : Html.DisplayFor(model => model.Street))</dd>
+
+                    <dt class="col-sm-4">المـحـافظـة</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.GovernateFkNavigation.GovernateName)</dd>
+
+                    <dt class="col-sm-4">الحـي</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.DistrectFkNavigation.DistrictName)</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة بيانات الدخول والهوية والصورة -->
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card card-warning card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user-circle me-1"></i> بيانات الدخول والهوية
+                </h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">اسـم المـستـخدم</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.UserName)</dd>
+
+                    <dt class="col-sm-4">الـرقم الـقـومـي</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Naid) ? "غير متوفر" : Html.DisplayFor(model => model.Naid))</dd>
+
+                    <dt class="col-sm-4">صـورة</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.Photo))
+                        {
+                            <!-- بافتراض أن Photo يخزن اسم الملف وأن الصور موجودة في المسار التالي -->
+                            <img src="@Url.Content($"~/uploads/user_photos/{Model.Photo}")" alt="صورة المستخدم" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">لا توجد صورة</span>
+                        }
+                    </dd>
+                    <!-- كلمة المرور (Password) يجب ألا تظهر هنا أبداً لأسباب أمنية -->
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة تواريخ الاشتراك -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card card-success card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-calendar-alt me-1"></i> تواريخ الاشتراك
+                </h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">تـاريـخ التـعـاقـد</dt>
+                    <dd class="col-sm-8">@(Model.StartDate.HasValue? Model.StartDate.Value.ToShortDateString() : "غير محدد")</dd>
+
+                    <dt class="col-sm-4">تـاريـخ نـهـايـة الاشـتراك</dt>
+                    <dd class="col-sm-8">@(Model.SubEndDate.HasValue? Model.SubEndDate.Value.ToShortDateString() : "غير محدد")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة معلومات إدارية ونظامية -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card card-dark card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-building me-1"></i> معلومات إدارية
+                </h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">كـود المـستـخدم</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.UserCode) ? "غير متوفر" : Html.DisplayFor(model => model.UserCode))</dd>
+
+                    <dt class="col-sm-4">الـشـركـة</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.CompanyFkNavigation.Name)</dd>
+
+                    <dt class="col-sm-4">الـفـرع</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.BranchFkNavigation.Name)</dd>
+
+                    <dt class="col-sm-4">المـسـار</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.DirctionFkNavigation.RouteName)</dd>
+
+                    <dt class="col-sm-4">اولـويـة</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Priority)</dd>
+
+                    <dt class="col-sm-4">حـسـاب الـمسـئول</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.ParentUser.HasValue)
+                        {
+                            <!-- If ParentUser هو مجرد معرّف (int)، سيتم عرضه.
+                                 إذا كان ParentUser يمثل خاصية تنقل (Navigation Property) لمستخدم آخر،
+                                 يجب عليك تضمينها في Controller (e.g., .Include(t => t.ParentUserNavigation))
+                                 وعندها يمكن عرض الاسم (e.g., Model.ParentUserNavigation.FullName) -->
+                            @Html.DisplayFor(model => model.ParentUser)
+                        }
+                        else
+                        {
+                            <span>لا يوجد</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

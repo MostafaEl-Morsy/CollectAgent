@@ -1,0 +1,114 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblDrawer>
+
+@foreach (var item in Model)
+{
+    <div class="col-lg-4 col-md-6 mb-4 drawer-card">
+        <div class="card shadow-sm h-100 border-top-3 border-top-primary">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary text-truncate" title="@item.UserFkNavigation?.FullName">
+                    <i class="fas fa-user-circle me-1"></i> @item.UserFkNavigation?.FullName
+                </h6>
+                <span class="badge bg-@(item.IsActive == true ? "success" : "danger") rounded-pill">
+                    @(item.IsActive == true ? "نشط" : "غير نشط")
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <p class="text-muted small mb-1">إجمالي العهدة النقدية</p>
+                    <h3 class="font-weight-bold text-dark">
+                        @string.Format("{0:N0}", item.TtlAmntOwned) <small class="text-muted" style="font-size: 0.6em;">ج.م</small>
+                    </h3>
+                </div>
+
+                <!-- جدول تفصيل الفئات -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-center small mb-0" style="font-size: 0.85rem;">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>200</th>
+                                <th>100</th>
+                                <th>50</th>
+                                <th>20</th>
+                                <th>فكة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-primary">@item.Le200</td>
+                                <td class="fw-bold text-primary">@item.Le100</td>
+                                <td class="fw-bold text-primary">@item.Le50</td>
+                                <td class="fw-bold text-primary">@item.Le20</td>
+                                <td class="fw-bold text-secondary">
+                                    @{
+                                        var smallChange = (item.Le10 ?? 0) + (item.Le5 ?? 0);
+                                    }
+                                    @smallChange
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-2 text-center small text-muted">
+                    <i class="far fa-calendar-alt"></i> تاريخ البدء: @item.StartDate?.ToString("yyyy-MM-dd")
+                </div>
+            </div>
+            <div class="card-footer bg-white text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning" title="تعديل الجرد">
+                        <i class="fas fa-edit"></i> تعديل
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="التفاصيل">
+                        <i class="fas fa-info-circle"></i> تفاصيل
+                    </a>
+                    @if (ViewBag.UserType < 6) 
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="حذف">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@* @foreach (var item in Model)
+{
+    <div class="col-md-4 col-sm-6 mb-4 drawer-item">
+        <div class="card shadow-sm h-100 border-top-info">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-success">نشط</span>
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-user-tie me-2"></i> @item.UserFkNavigation?.FullName</h6>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <small class="text-muted">إجمالي النقدية بالخزينة</small>
+                    <h3 class="text-primary fw-bold">@item.TtlAmntOwned?.ToString("N0") <small>ج.م</small></h3>
+                </div>
+
+                <table class="table table-sm table-borderless small">
+                    <tr>
+                        <td><span class="badge bg-secondary">200 ج</span> @(item.Le200 ?? 0)</td>
+                        <td><span class="badge bg-secondary">100 ج</span> @(item.Le100 ?? 0)</td>
+                        <td><span class="badge bg-secondary">50 ج</span> @(item.Le50 ?? 0)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-secondary">20 ج</span> @(item.Le20 ?? 0)</td>
+                        <td><span class="badge bg-secondary">10 ج</span> @(item.Le10 ?? 0)</td>
+                        <td><span class="badge bg-secondary">5 ج</span> @(item.Le5 ?? 0)</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card-footer d-flex justify-content-around bg-white">
+                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-info-circle"></i> تفاصيل
+                </a>
+                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-edit"></i> تعديل
+                </a>
+            </div>
+        </div>
+    </div>
+} *@

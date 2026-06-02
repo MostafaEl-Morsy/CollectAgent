@@ -1,0 +1,132 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblOrder>
+
+@{
+    ViewData["Title"] = "سجل الإيداعات";
+}
+
+@section Styles{
+    <link href="~/css/custom-style.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<!-- قسم البحث والتصفية -->
+<div class="card card-outline card-primary mb-4">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-search"></i> بحث وتصفية</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Index" method="get">
+            <div class="row gy-3 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label for="searchTerm" class="form-label">بحث بالرقم المرجعي أو الوصف</label>
+                    <input type="text" name="searchTerm" class="form-control" placeholder="ادخل كلمة البحث..." value="@ViewData["CurrentSearchTerm"]" />
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label for="fromDate" class="form-label">من تاريخ</label>
+                    <input type="date" name="fromDate" class="form-control" value="@ViewData["CurrentFromDate"]" />
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label for="toDate" class="form-label">إلى تاريخ</label>
+                    <input type="date" name="toDate" class="form-control" value="@ViewData["CurrentToDate"]" />
+                </div>
+                <div class="col-lg-2 col-md-6 d-grid">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> عرض</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- زر إضافة إيداع جديد -->
+<p>
+    <a asp-action="Create" class="btn btn-success mb-3"><i class="fas fa-plus"></i> إيداع جديد</a>
+</p>
+
+<!-- ✅ حاوية عرض البطاقات (أضفنا لها ID) -->
+<div id="deposits-container" class="row gy-4">
+    @if (Model.Any())
+    {
+        @await Html.PartialAsync("_DepositCardPartial", Model)
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <h4>لا توجد نتائج</h4>
+                <p>لم يتم العثور على أي معاملات إيداع تطابق معايير البحث الحالية.</p>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- ✅ مؤشر التحميل (Spinner) -->
+<div id="loading-spinner" class="text-center my-4" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">جاري التحميل...</span>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            // --- متغيرات لتتبع حالة التحميل ---
+            let page = 2; // نبدأ من الصفحة الثانية لأن الأولى تم تحميلها بالفعل
+            let isLoading = false; // لمنع إرسال طلبات متعددة في نفس الوقت
+            let hasMorePages = @(ViewBag.HasMorePages.ToString().ToLower()); // هل يوجد المزيد من الصفحات
+
+            // --- دالة تحميل المزيد من البيانات ---
+            function loadMoreData() {
+                if (isLoading || !hasMorePages) {
+                    return; // الخروج إذا كان هناك طلب قيد التنفيذ أو لا توجد صفحات أخرى
+                }
+
+                isLoading = true;
+                $('#loading-spinner').show(); // إظهار مؤشر التحميل
+
+                // جلب قيم البحث الحالية من حقول النموذج
+                const searchTerm = $('input[name="searchTerm"]').val();
+                const fromDate = $('input[name="fromDate"]').val();
+                const toDate = $('input[name="toDate"]').val();
+
+                $.ajax({
+                    url: '@Url.Action("LoadMoreDeposits")',
+                    type: 'GET',
+                    data: {
+                        page: page,
+                        searchTerm: searchTerm,
+                        fromDate: fromDate,
+                        toDate: toDate
+                    },
+                    success: function (response) {
+                        if (response.trim().length > 0) {
+                            $('#deposits-container').append(response); // إضافة البطاقات الجديدة
+                            page++; // زيادة رقم الصفحة للطلب التالي
+                        } else {
+                            hasMorePages = false; // لا توجد بيانات أخرى، أوقف الطلبات المستقبلية
+                            $('#loading-spinner').hide();
+                        }
+                    },
+                    error: function () {
+                        console.error("حدث خطأ أثناء تحميل المزيد من البيانات.");
+                        // يمكنك إضافة رسالة خطأ للمستخدم هنا
+                    },
+                    complete: function () {
+                        isLoading = false; // السماح بطلبات جديدة
+                        if(hasMorePages){
+                            $('#loading-spinner').hide(); // إخفاء المؤشر إذا كان لا يزال هناك صفحات
+                        }
+                    }
+                });
+            }
+
+            // --- مراقبة حدث التمرير في الصفحة ---
+            $(window).scroll(function () {
+                // التحقق إذا وصل المستخدم إلى 250 بكسل من نهاية الصفحة
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 250) {
+                    loadMoreData();
+                }
+            });
+        });
+    </script>
+}

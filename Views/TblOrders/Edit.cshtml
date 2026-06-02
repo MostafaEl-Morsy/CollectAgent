@@ -1,0 +1,79 @@
+﻿@model DatabaseAccess.Models.TblOrder
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TblOrder</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="UserFk" class="control-label"></label>
+                <select asp-for="UserFk" class="form-control" asp-items="ViewBag.UserFk"></select>
+                <span asp-validation-for="UserFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OrderNo" class="control-label"></label>
+                <input asp-for="OrderNo" class="form-control" />
+                <span asp-validation-for="OrderNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegidFk" class="control-label"></label>
+                <select asp-for="RegidFk" class="form-control" asp-items="ViewBag.RegidFk"></select>
+                <span asp-validation-for="RegidFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProdidFk" class="control-label"></label>
+                <select asp-for="ProdidFk" class="form-control" asp-items="ViewBag.ProdidFk"></select>
+                <span asp-validation-for="ProdidFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IndebtBefore" class="control-label"></label>
+                <input asp-for="IndebtBefore" class="form-control" />
+                <span asp-validation-for="IndebtBefore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlncAmntOrder" class="control-label"></label>
+                <input asp-for="BlncAmntOrder" class="form-control" />
+                <span asp-validation-for="BlncAmntOrder" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IndebtAfter" class="control-label"></label>
+                <input asp-for="IndebtAfter" class="form-control" />
+                <span asp-validation-for="IndebtAfter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransDate" class="control-label"></label>
+                <input asp-for="TransDate" class="form-control" />
+                <span asp-validation-for="TransDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateAndTime" class="control-label"></label>
+                <input asp-for="DateAndTime" class="form-control" />
+                <span asp-validation-for="DateAndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StatusFk" class="control-label"></label>
+                <select asp-for="StatusFk" class="form-control" asp-items="ViewBag.StatusFk"></select>
+                <span asp-validation-for="StatusFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

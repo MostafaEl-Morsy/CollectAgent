@@ -1,0 +1,203 @@
+﻿@model CollectAgent.ViewModels.AddUserViewModel
+
+@{
+    ViewBag.Title = "إضافة مستخدم جديد";
+    int userType = ViewBag.CurrentUserType ?? 1;
+}
+
+<section class="section-container">
+    <div class="content-wrapper">
+        <div class="content-heading">
+            @(userType == 7 ? "إضــافــة تاجـر" : "إضــافــة مـنــدوب")    <small>يرجى تعبئة كافة البيانات المطلوبة</small>
+        </div>
+
+        <div class="card card-default">
+            <div class="card-body">
+                <form asp-controller="TblUsers" asp-action="AddUser" method="post" class="form-horizontal">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Password" value="000000" />
+                    <input type="hidden" asp-for="ConfirmPassword" value="000000" />
+
+                    @* لعرض أي أخطاء عامة على مستوى النموذج (Model-level errors) *@
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" />
+
+                    <h4>1. البيانات الشخصية وبيانات المحل</h4>
+                    <hr />
+
+                    <div class="form-group row mb-3">
+                        <label asp-for="Code" class="col-lg-2 col-form-label"></label>
+                        <div class="col-lg-10">
+                            <input asp-for="Code" class="form-control" placeholder="اسم المحل" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label asp-for="FullName" class="col-lg-2 col-form-label"></label>
+                        <div class="col-lg-10">
+                            <input asp-for="FullName" class="form-control" placeholder="ادخل الاسم الثلاثي" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label asp-for="ContactNo" class="col-lg-2 col-form-label"></label>
+                        <div class="col-lg-10">
+                            <input asp-for="ContactNo" class="form-control" placeholder="01xxxxxxxxx" />
+                            <span asp-validation-for="ContactNo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label asp-for="Governate_FK" class="col-lg-2 col-form-label"></label>
+                        <div class="col-lg-10">
+                            <select asp-for="Governate_FK" asp-items="Model.Governates" class="form-control" id="governateDropdown">
+                                <option value="">--- اختر المحافظة ---</option>
+                            </select>
+                            <span asp-validation-for="Governate_FK" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label asp-for="Distrect_FK" class="col-lg-2 col-form-label"> أختر المنطـقة / حـي</label>
+                        <div class="col-lg-10">
+                            <select asp-for="Distrect_FK" asp-items="Model.Districts" class="form-control" id="districtDropdown">
+                                <option value="">--- اختر المنطقة ---</option>
+                            </select>
+                            <span asp-validation-for="Distrect_FK" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label asp-for="Address" class="col-lg-2 col-form-label"></label>
+                        <div class="col-lg-10">
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @if (userType < 6)
+                    {
+                        <div class="form-group row mb-3">
+                            <label asp-for = "CompanyFk" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-10">
+                                <select asp-for="CompanyFk" asp-items="Model.Companies" class="form-control">
+                                    <option value="">--- اختر شركة الوكيل ---</option>
+                                </select>
+                                <span asp-validation-for = "CompanyFk" class="text-danger"></span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (userType < 7)
+                    {
+                        <h4 class="mt-4">2. بيانات الدخول والصلاحيات</h4>
+                        <hr />
+
+                        <div class="form-group row mb-3">
+                            <label asp-for="UserName" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-10">
+                                <input asp-for="UserName" class="form-control" id="userName" onblur="checkUsername()" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-3">
+                            <label asp-for="UserTypeFk" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-10">
+                                <select asp-for="UserTypeFk" asp-items="Model.UserTypes" class="form-control" required>
+                                    <option value="">--- اختر الصلاحية ---</option>
+                                </select>
+                                <span asp-validation-for="UserTypeFk" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-3">
+                            <label asp-for="Indebtedness" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-10">
+                                <input asp-for="Indebtedness" class="form-control" placeholder="مديونية" required />
+                                <span asp-validation-for="Indebtedness" class="text-danger"></span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="UserTypeFk" />
+                        <input type="hidden" asp-for="UserName" />
+                        <input type="hidden" asp-for="SubEndDate" />
+                    }
+
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label">مفعل</label>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="offset-lg-2 col-lg-10">
+                            <button type="submit" class="btn btn-primary" id="submit">حفظ وإنشاء المستخدم</button>
+                            <a asp-controller="TblUsers" asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    @* هذا السكربت ضروري لتفعيل التحقق من الصحة من جانب العميل *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script type="text/javascript">
+         // مثال لتحميل المناطق بناءً على المحافظة المختارة (Cascading Dropdowns)
+         $(document).ready(function () {
+             $('#governateDropdown').change(function () {
+                 var selectedGovId = $(this).val();
+                 var districtDropdown = $('#districtDropdown');
+                 districtDropdown.empty(); // مسح الخيارات الحالية
+
+                 if (selectedGovId) {
+                     $.getJSON('@Url.Action("GetDistrictsByGovernateId")', { governateId: selectedGovId }, function (districts) {
+                         districtDropdown.append($('<option/>', { value: '', text: '--- اختر المنطقة ---' }));
+                         $.each(districts, function (i, district) {
+                             districtDropdown.append($('<option/>', { value: district.value, text: district.text }));
+                         });
+                     });
+                 } else {
+                      districtDropdown.append($('<option/>', { value: '', text: '--- اختر المحافظة أولاً ---' }));
+                 }
+             });
+         });
+
+         function checkUsername() {
+             var username = $("#userName").val();
+             var validationSpan = $("span[data-valmsg-for='UserName']"); // استهداف عنصر رسالة الخطأ الصحيح
+
+             if (username) {
+                 $.ajax({
+                     url: '@Url.Action("CheckUsernameAvailability", "TblUsers")',
+                     type: 'POST',
+                     data: { username: username },
+                     success: function (response) {
+                         if (response.exists) {
+                             validationSpan.text("اسم المستخدم موجود مسبقا").addClass("text-danger");
+                             // $("#vldtUser").text("اسم المستخدم موجود مسبقا").addClass("text-danger");
+                             $("#submit").attr("disabled", "disabled");
+                         } else {
+                             validationSpan.text("").removeClass("text-danger");
+                             // $("#vldtUser").text("").removeClass("text-danger");
+                             $("#submit").removeAttr("disabled");
+                         }
+                     },
+                     error: function () {
+                        // يمكنك عرض رسالة خطأ أكثر تفصيلاً هنا إذا أردت
+                        validationSpan.text("حدث خطأ أثناء التحقق.").addClass("text-danger");
+                         // alert("حدث خطأ أثناء التحقق من اسم المستخدم");
+                     }
+                 });
+             }
+         }
+    </script>
+}

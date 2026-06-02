@@ -1,0 +1,42 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblRegistration>
+
+@foreach (var item in Model)
+{
+    var statusClass = item.IsActive ? "border-success" : "border-danger";
+    var statusText = item.IsActive ? "فعال" : "غير فعال";
+    var statusBadge = item.IsActive ? "badge bg-success" : "badge bg-danger";
+
+    <div class="col-md-6 col-lg-4 mb-4 registration-card">
+        <div class="card shadow-sm h-100 @statusClass" style="border-width: 0 0 0 4px;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title mb-1">@item.AccNameNo</h5>
+                        <p class="card-text text-muted small">
+                            <i class="fas fa-user me-1"></i> @(item.UserFkNavigation?.UserCode ?? item.UserFkNavigation?.FullName)
+                        </p>
+                    </div>
+                    <span class="@statusBadge">@statusText</span>
+                </div>
+                <hr class="my-2">
+                <div class="row">
+                    <div class="col-6">
+                        <p class="mb-1"><strong class="d-block text-muted small">الكود:</strong> @(item.Code ?? "N/A")</p>
+                        <p class="mb-0"><strong class="d-block text-muted small">الرصيد:</strong> @item.Balance.ToString("N0")</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1"><strong class="d-block text-muted small">المزود:</strong> @item.ProviderFkNavigation.ProviderCode</p>
+                        <p class="mb-0"><strong class="d-block text-muted small">تاريخ البدء:</strong> @(item.StartDate?.ToString("yyyy-MM-dd") ?? "N/A")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light d-flex justify-content-end">
+                <div class="btn-group" role="group">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="تعديل"><i class="fas fa-edit"></i></a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="تفاصيل"><i class="fas fa-info-circle"></i></a>
+                    @* <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="حذف"><i class="fas fa-trash-alt"></i></a> *@
+                </div>
+            </div>
+        </div>
+    </div>
+}

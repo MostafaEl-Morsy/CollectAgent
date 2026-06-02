@@ -1,0 +1,129 @@
+﻿@model DatabaseAccess.Models.TblRegistration
+
+@{
+    ViewData["Title"] = "إنشاء حساب POS جديد";
+}
+
+<!-- استخدام تصميم AdminLTE Card للحصول على شكل متناسق -->
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">@ViewData["Title"]</h3>
+    </div>
+    <!-- /.card-header -->
+    <!-- form start -->
+    <form asp-action="Create">
+        <div class="card-body">
+            <!-- رسالة خطأ عامة -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <!-- قسم المستخدم -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="UserFk"></label>
+                        <!-- تمت إضافة كلاس 'select2' لتفعيل البحث -->
+                        <select asp-for="UserFk" class="form-control select2" asp-items="ViewBag.UserFk">
+                            <option value="">-- اختر المستخدم --</option>
+                        </select>
+                        <span asp-validation-for="UserFk" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- قسم مزود الخدمة -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ProviderFk"></label>
+                        <select asp-for="ProviderFk" class="form-control select2" asp-items="ViewBag.ProviderFk">
+                            <option value="">-- اختر مزود الخدمة --</option>
+                        </select>
+                        <span asp-validation-for="ProviderFk" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- قسم رقم الحساب -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="AccNameNo"></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                            </div>
+                            <input asp-for="AccNameNo" class="form-control" placeholder="أدخل رقم الحساب..." />
+                        </div>
+                        <span asp-validation-for="AccNameNo" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- قسم كود الحساب -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Code"></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                            </div>
+                            <input asp-for="Code" class="form-control" placeholder="أدخل الكود ..." />
+                        </div>
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- قسم الرصيد -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Balance"></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+                            </div>
+                            <input asp-for="Balance" class="form-control" type="number" step="0.01" />
+                        </div>
+                        <span asp-validation-for="Balance" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- قسم تاريخ البدء -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="StartDate"></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                            <!-- استخدام type="date" لعرض منتقي التاريخ -->
+                            <input asp-for="StartDate" class="form-control" type="date" />
+                        </div>
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> حفظ
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-right"></i> العودة للقائمة
+            </a>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            // تفعيل مكتبة Select2 على كل العناصر التي تحمل كلاس 'select2'
+            $('.select2').select2({
+                theme: 'bootstrap-5' // تطبيق ثيم Bootstrap 5 ليبدو متناسقاً
+            });
+        });
+    </script>
+}

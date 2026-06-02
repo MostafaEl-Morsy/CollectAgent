@@ -1,0 +1,99 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblServTrnx>
+
+@if (Model.Any())
+{
+    foreach (var item in Model)
+    {
+        // --- 1. تحديد الأيقونات بناءً على اسم الخدمة ---
+        string pName = item.ServProdFkNavigation?.ServProdName ?? "";
+
+        // أيقونة الاتجاه: سهم فوق أحمر للسحب، سهم تحت أخضر للإيداع
+        string dirIcon = pName.Contains("سحب") ? "fa-arrow-up text-danger" : "fa-arrow-down text-success";
+
+        // أيقونة النوع: بنك للمحافظ البنكية، موبايل لشركات الاتصالات
+        string typeIcon = "fa-wallet text-secondary"; // افتراضي
+        if (pName.Contains("بنك") || pName.Contains("الأهلي") || pName.Contains("مصر")) { typeIcon = "fa-university text-primary"; }
+        else if (pName.Contains("كاش") || pName.Contains("فودافون") || pName.Contains("إي أند") || pName.Contains("اتصالات")) { typeIcon = "fa-mobile-alt text-info"; }
+
+        <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+            <div class="transaction-card mb-3 d-flex align-items-center p-3 shadow-sm bg-white rounded">
+
+                <!-- أيقونة النوع (بنك/موبايل) -->
+                <div class="ms-3 text-center" style="width: 50px;">
+                    <i class="fas @typeIcon fa-2x"></i>
+                </div>
+
+                <!-- تفاصيل العملية -->
+                <div class="flex-grow-1 text-end" dir="rtl">
+                    <h6 class="fw-bold mb-1">@pName</h6>
+                    <div class="text-muted small">
+                        من: @(item.SenderUser?.FullName ?? "-") | إلى: @(item.RecvrUser?.FullName ?? "بيع مباشر")
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">
+                        قبل: @item.SendrBlncBfr.ToString("N0") | بعد: @item.SendrBlncAftr.ToString("N0")
+                    </div>
+                </div>
+
+                <!-- المبلغ وأيقونة السحب/الإيداع -->
+                <div class="d-flex align-items-center me-3">
+                    <div class="text-start px-3">
+                        <div class="fw-bold @(pName.Contains("سحب") ? "text-danger" : "text-success")" style="font-size: 1.2rem;">
+                            @item.TotalPriceTrx.ToString("N2")
+                        </div>
+                        <div class="text-muted small">@item.DateAndTime.ToString("dd MMM, hh:mm tt")</div>
+                    </div>
+                    <i class="fas @dirIcon fa-2x"></i>
+                </div>
+            </div>
+        </a>
+    }
+}
+
+
+
+@* @model IEnumerable<DatabaseAccess.Models.TblServTrnx>
+
+@if (Model.Any())
+{
+    foreach (var item in Model)
+    {
+        bool isCredit = item.TotalPriceTrx >= 0;
+        var amountClass = isCredit ? "positive" : "negative";
+        var iconClass = isCredit ? "fa-arrow-down text-success" : "fa-arrow-up text-danger";
+        var statusColor = item.StatusFk == 1 ? "bg-success" : "bg-warning";
+
+        <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark transaction-card-link mb-3">
+            <div class="transaction-card">
+                <div class="transaction-icon me-3">
+                    <i class="fas @iconClass fa-2x"></i>
+                </div>
+                <div class="transaction-details">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="shop-name mb-0">
+                            @item.ServProdFkNavigation.ServProdName
+                            <span class="badge @statusColor ms-2">@item.StatusFkNavigation.StatusName</span>
+                        </h6>
+                    </div>
+                    <div class="transaction-meta text-muted small mt-1">
+                        <span>من: <strong>@item.SenderUser.FullName</strong></span>
+                        <span class="mx-2">|</span>
+                        <span>إلى: <strong>@(item.RecvrUser?.FullName ?? "بيع مباشر")</strong></span>
+                    </div>
+                    <div class="transaction-meta text-muted small">
+                        <span>الرصيد قبل: <strong>@item.SendrBlncBfr.ToString("N0")</strong></span>
+                        <span class="mx-2">|</span>
+                        <span>بعد: <strong>@item.SendrBlncAftr.ToString("N0")</strong></span>
+                    </div>
+                </div>
+                <div class="text-start ms-3">
+                    <div class="transaction-amount @amountClass">
+                        @item.TotalPriceTrx.ToString("N2")
+                    </div>
+                    <div class="transaction-meta text-muted small mt-1" dir="ltr">
+                        @item.DateAndTime.ToString("dd MMM, yyyy hh:mm tt")
+                    </div>
+                </div>
+            </div>
+        </a>
+    }
+} *@

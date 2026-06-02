@@ -1,0 +1,229 @@
+﻿<!-- Welcome Section -->
+<div class="welcome-section mb-4">
+    <h2 class="welcome-title">
+        <span class="greeting">مرحباً</span>
+        <span class="username">@Context.Session.GetString("FullName")</span>
+    </h2>
+    <p class="welcome-subtitle">لوحة التحكم الخاصة بك جاهزة للعمل</p>
+</div>
+
+<!-- Main Actions Card with Enhanced Design -->
+<div class="card main-actions-card">
+    @* <div class="card-header gradient-header">
+        <h3 class="card-title">
+            <i class="fas fa-th-large me-2 pulse-icon"></i>
+            العمليات السريعة
+        </h3>
+        <div class="card-tools">
+            <span class="badge bg-light text-dark">4 عمليات متاحة</span>
+        </div>
+    </div> *@
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a asp-controller="TblUsers" asp-action="Index" asp-route-mode="oprate" class="action-btn-enhanced bg-gradient-blue">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <span class="btn-text">تحويل رصـيد</span>
+                    <span class="btn-subtitle">بين الحسابات</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Coll" asp-action="Index" class="action-btn-enhanced bg-gradient-green">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <span class="btn-text">تحـصــيل</span>
+                    <span class="btn-subtitle">إدارة المدفوعات</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="TblDepositOrders" asp-action="DepositType" class="action-btn-enhanced bg-gradient-teal">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <span class="btn-text">الـتوريـد</span>
+                    <span class="btn-subtitle">الإيداع النقدي</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Home" asp-action="TreansactionIndex" class="action-btn-enhanced bg-gradient-purple">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <span class="btn-text">العمليات/جرد</span>
+                    <span class="btn-subtitle">التقارير المالية</span>
+                </a>
+            </div>
+            @{
+                var cashWallet = Url.Action("Wallet", "TblServProducts", new { @merchantId = ViewBag.UserId, @provType = 3 });
+            }
+            <div class="col-6 col-md-3">
+                @* <a asp-controller="TblServProducts" asp-action="Wallet" class="action-btn-enhanced bg-gradient-teal"> *@
+                @* <a href="@cashWallet" class="action-btn-enhanced bg-gradient-red"> *@
+                <a asp-controller="TblServProducts" asp-action="Wallet" asp-route-merchantId="@ViewBag.UserId" asp-route-provType="3" class="action-btn-enhanced bg-gradient-red ">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <span class="btn-text">محـافـظ الـكاش</span>
+                    <span class="btn-subtitle">سـحـب و ايـداع</span>
+                </a>
+            </div>
+            @{
+                var bankWallet = Url.Action("Wallet", "TblServProducts", new { @merchantId = ViewBag.UserId, @provType = 4 });
+            }
+            <div class="col-6 col-md-3">
+                @* <a asp-controller="TblServProducts" asp-action="Wallet" class="action-btn-enhanced bg-gradient-teal"> *@
+                @* <a onclick="window.location = ('@bankWallet')" class="action-btn-enhanced bg-gradient-orange"> *@
+                <a asp-controller="TblServProducts" asp-action="Wallet" asp-route-merchantId="@ViewBag.UserId" asp-route-provType="4" class="action-btn-enhanced bg-gradient-orange ">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <span class="btn-text">المحـافظ البنكيـة</span>
+                    <span class="btn-subtitle">استـلام و تحـويـل</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+@* <div class="row mt-4">
+    <div class="col-12">
+        <h4 class="section-title mb-3">
+            <i class="fas fa-chart-line me-2"></i>
+            إحصائيات اليوم
+        </h4>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <div class="stat-content">
+                <h5>عمليات اليوم</h5>
+                <p class="stat-number counter" data-count="45">0</p>
+                <span class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> 12%
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <h5>إجمالي المبيعات</h5>
+                <p class="stat-number">12,543 <small>ج.م</small></p>
+                <span class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> 8%
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h5>عملاء جدد</h5>
+                <p class="stat-number counter" data-count="7">0</p>
+                <span class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i> 3%
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-danger">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h5>معاملات معلقة</h5>
+                <p class="stat-number counter" data-count="3">0</p>
+                <span class="stat-change neutral">
+                    <i class="fas fa-minus"></i> 0%
+                </span>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<!-- Recent Activities -->
+@* <div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-history me-2"></i>
+            آخر الأنشطة
+        </h3>
+        <div class="card-tools">
+            <button class="btn btn-sm btn-primary">عرض الكل</button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon bg-success">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="activity-content">
+                    <h6>عملية تحصيل ناجحة</h6>
+                    <p>تم تحصيل 1,500 ج.م من العميل أحمد محمد</p>
+                    <span class="activity-time">منذ 5 دقائق</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon bg-info">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="activity-content">
+                    <h6>تحويل رصيد</h6>
+                    <p>تم تحويل 3,000 ج.م إلى حساب البنك</p>
+                    <span class="activity-time">منذ 15 دقيقة</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon bg-warning">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="activity-content">
+                    <h6>عميل جديد</h6>
+                    <p>تم إضافة العميل محمد علي</p>
+                    <span class="activity-time">منذ ساعة</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+@section Scripts {
+    <script>
+        // Counter Animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const counters = document.querySelectorAll('.counter');
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-count');
+                const increment = target / 200;
+
+                const updateCount = () => {
+                    const count = +counter.innerText;
+
+                    if(count < target) {
+                        counter.innerText = Math.ceil(count + increment);
+                        setTimeout(updateCount, 10);
+                    } else {
+                        counter.innerText = target;
+                    }
+                }
+
+                updateCount();
+            });
+        });
+    </script>
+}

@@ -1,0 +1,83 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblServProvReg>
+@foreach (var item in Model)
+{
+    <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-sm h-100 border-top-3 @(item.IsActive == true ? "border-success" : "border-danger")">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <span class="fw-bold">
+                    <i class="fas fa-wallet me-2 text-primary"></i> @item.Code
+                </span>
+                @if (item.IsActive == true)
+                {
+                    <span class="badge bg-success">فعال</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">غير فعال</span>
+                }
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <!-- أيقونة تعبيرية عن مزود الخدمة -->
+                        @* <div class="bg-light p-3 rounded-circle text-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-sim-card fa-2x text-secondary"></i>
+                        </div> *@
+                        <!-- مكان الصورة: تم إصلاح المسار -->
+                        <div class="flex-shrink-0">
+                            @{
+                                // كود إصلاح مسار الصورة
+                                var imgPath = item.ServProvFkNavigation.ProviderLogo;
+                                if (!string.IsNullOrEmpty(imgPath))
+                                {
+                                    // نحذف علامة ~ ونضمن وجود / في البداية
+                                    imgPath = "/" + imgPath.Replace("~", "").TrimStart('/');
+                                }
+                            }
+
+                            @if (!string.IsNullOrEmpty(imgPath))
+                            {
+                                <img src="@Url.Content(imgPath)"
+                                     onerror="this.onerror=null; this.src='/lib/adminlte/assets/img/avatar.png';"
+                                     class="rounded-circle shadow-sm border p-1"
+                                     style="width: 55px; height: 55px; object-fit: contain; background: #fff;" />
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-primary border"
+                                     style="width: 55px; height: 55px;">
+                                    <i class="fas fa-building fa-lg"></i>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-0">@item.ServProvFkNavigation?.ProviderName</h5> <!-- اسم المزود مثل فودافون -->
+                        <small class="text-muted">@item.ServNo</small> <!-- رقم المحفظة -->
+                    </div>
+                </div>
+                
+                <div class="bg-body-secondary p-2 rounded text-center mb-3">
+                    <span class="d-block text-muted small">الرصيد الحالي</span>
+                    <h4 class="mb-0 fw-bold text-dark">@item.Balance <small class="fs-6">ج.م</small></h4>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted small">
+                    <span><i class="fas fa-user me-1"></i> @item.UserFkNavigation?.FullName</span>
+                    <span><i class="far fa-calendar-alt me-1"></i> @item.StartDate?.ToString("yyyy/MM/dd")</span>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                        <i class="fas fa-edit"></i> تعديل
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info flex-fill">
+                        <i class="fas fa-eye"></i> تفاصيل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

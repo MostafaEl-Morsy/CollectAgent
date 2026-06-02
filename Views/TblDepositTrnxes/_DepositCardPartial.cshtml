@@ -1,0 +1,81 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblDepositTrnx>
+
+@foreach (var item in Model)
+{
+    <div class="col-md-12">
+        <div class="deposit-card">
+            <!-- الجزء العلوي من البطاقة -->
+            <div class="deposit-card-header">
+                <div class="deposit-amount">
+                    <span>@item.DepositAmount.ToString("N0")</span>
+                    <small>ج.م</small>
+                </div>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm">سجل الإيداع</a>
+            </div>
+
+            <!-- الجزء الأوسط من البطاقة - تفاصيل العملية -->
+            <div class="deposit-card-body">
+                <div class="deposit-meta">
+                    <span><i class="fas fa-calendar-alt text-muted"></i> <strong>التاريخ:</strong> @item.Date.ToString("yyyy/MM/dd")</span>
+                    <span><i class="fas fa-building text-muted"></i> <strong>الشركة:</strong> @(item.Provider?.ProviderCode ?? "N/A")</span>
+                    <span><i class="fas fa-info-circle text-muted"></i> <strong>الحالة:</strong> @(item.StatusIdFkNavigation?.StatusName ?? "N/A")</span>
+                </div>
+            </div>
+
+            <!-- الجزء السفلي من البطاقة - الفئات والصورة -->
+            <div class="deposit-card-footer">
+                <div class="denominations">
+                    <small>
+                        <strong>الفئات:</strong>
+                        @if (item.Le500 > 0)
+                        {
+                            <span>500x @item.Le500</span>
+                        }
+                        @if (item.Le200 > 0)
+                        {
+                            <span>200x @item.Le200</span>
+                        }
+                        @if (item.Le100 > 0)
+                        {
+                            <span>100x @item.Le100 </span>
+                        }
+                        @if (item.Le50 > 0)
+                        {
+                            <span>50x @item.Le50 </span>
+                        }
+                        @if (item.Le20 > 0)
+                        {
+                            <span>20x @item.Le20</span>
+                        }
+                        @if (item.Le10 > 0)
+                        {
+                            <span>10x @item.Le10</span>
+                        }
+                        @if (item.Le5 > 0)
+                        {
+                            <span>5x @item.Le5</span>
+                        }
+                    </small>
+                    <div class="mt-2">
+                        <small><strong>المرجع:</strong> @item.ReferenceCode</small>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(item.DepositPhoto))
+                {
+                    <div class="deposit-thumbnail">
+                        <a href="~/@item.DepositPhoto" target="_blank">
+                            <img src="~/@item.DepositPhoto" alt="صورة الإيداع" />
+                        </a>
+                    </div>
+                }
+            </div>
+            <!-- روابط الإجراءات -->
+            @* <div class="deposit-card-actions">
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">تعديل</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">تفاصيل</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">حذف</a>
+            </div> *@
+        </div>
+    </div>
+}

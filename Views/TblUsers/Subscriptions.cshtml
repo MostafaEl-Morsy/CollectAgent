@@ -1,0 +1,208 @@
+﻿@{
+    ViewData["Title"] = "إدارة الاشتراكات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* إعادة استخدام نفس تنسيقات الكروت من صفحة Index الحالية */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .user-card {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .user-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+        /* تنسيق قسم الفلترة ليشبه التصميم القديم */
+        .filter-card {
+            border-top: 3px solid #007bff; /* الأزرق المميز */
+        }
+    </style>
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3"><i class="fas fa-users-cog ms-2"></i> @ViewData["Title"]</h3>
+        </div>
+    </div>
+
+    <!-- 1. قسم الفلترة والبحث -->
+    <div class="card shadow-sm mb-4 filter-card">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0"><i class="fas fa-filter ms-2 text-primary"></i>خيارات البحث والفلترة</h5>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">بحث (الاسم / الرقم)</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="بحث سريع..." />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">من تاريخ انتهاء</label>
+                    <input type="date" id="fromDate" class="form-control" value="@ViewBag.FromDate" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">إلى تاريخ انتهاء</label>
+                    <input type="date" id="toDate" class="form-control" value="@ViewBag.ToDate" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button type="button" id="btnFilter" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> عرض النتائج
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. قسم النتائج (Grid) -->
+    <div class="card shadow-sm border-0 bg-transparent">
+        <div class="card-body p-0">
+            <div id="usersContainer" class="user-grid">
+                <!-- سيتم تحميل الكروت هنا عبر AJAX -->
+            </div>
+
+            <!-- مؤشر التحميل -->
+            <div id="loadingSpinner" class="text-center py-4" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+            </div>
+
+            <div id="noMoreData" class="alert alert-secondary text-center mt-3" style="display: none;">
+                لا توجد اشتراكات أخرى لعرضها وفقاً للفلترة الحالية.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let page = 1;
+            let isLoading = false;
+            let hasMore = true;
+
+            // دالة لجلب البيانات
+            function loadUsers(reset = false) {
+                if (isLoading) return;
+                if (reset) {
+                    page = 1;
+                    hasMore = true;
+                    $('#usersContainer').empty();
+                    $('#noMoreData').hide();
+                }
+
+                if (!hasMore) return;
+
+                isLoading = true;
+                $('#loadingSpinner').show();
+
+                const search = $('#searchInput').val();
+                const from = $('#fromDate').val();
+                const to = $('#toDate').val();
+
+                $.ajax({
+                    url: '@Url.Action("GetSubscriptionUsers", "TblUsers")',
+                    type: 'GET',
+                    data: { page: page, searchTerm: search, fromDate: from, toDate: to },
+                    success: function (data) {
+                        if ($.trim(data)) {
+                            $('#usersContainer').append(data);
+                            page++;
+                        } else {
+                            hasMore = false;
+                            if (page > 1) $('#noMoreData').show(); // إظهار الرسالة فقط إذا كان هناك صفحات سابقة
+                            else $('#usersContainer').html('<div class="col-12 text-center p-5 text-muted"><h5>لا توجد نتائج مطابقة</h5></div>');
+                        }
+                    },
+                    error: function () {
+                        alert('حدث خطأ أثناء تحميل البيانات');
+                    },
+                    complete: function () {
+                        isLoading = false;
+                        $('#loadingSpinner').hide();
+                    }
+                });
+            }
+
+            // التحميل الأولي عند فتح الصفحة
+            loadUsers(true);
+
+            // عند الضغط على زر عرض النتائج
+            $('#btnFilter').click(function () {
+                loadUsers(true);
+            });
+
+            // البحث التلقائي عند الكتابة (مع تأخير بسيط)
+            let timer;
+            $('#searchInput').on('keyup', function () {
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    loadUsers(true);
+                }, 500);
+            });
+
+            // Infinite Scroll
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                    loadUsers();
+                }
+            });
+        });
+
+        // دالة تغيير الحالة (تفعيل/إيقاف)
+        function toggleStatus(userId) {
+            if (!confirm('هل أنت متأكد من تغيير حالة الاشتراك لهذا المستخدم؟')) return;
+
+            $.post('@Url.Action("ChangeStatus", "TblUsers")', { id: userId }, function (res) {
+                if (res.success) {
+                    // تحديث الواجهة بناءً على القيم الجديدة
+                    const btn = $('#btn-' + userId);
+                    const btnText = $('#btn-text-' + userId);
+                    const badge = $('#badge-' + userId);
+                    const dateTxt = $('#date-' + userId);
+
+                    if (res.newState === true) {
+                        // أصبح مشترك
+                        btn.removeClass('btn-success').addClass('btn-danger');
+                        btn.find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+                        btnText.text('إيقاف الاشتراك');
+
+                        badge.removeClass('bg-danger').addClass('bg-success').text('مشترك');
+
+                        // تحديث التاريخ إذا تغير
+                        if (res.newDate) {
+                             dateTxt.html(`<i class="far fa-calendar-times ms-2 text-muted"></i> ينتهي في: ${res.newDate}`).removeClass('text-danger fw-bold').addClass('text-dark');
+                        }
+                    } else {
+                        // أصبح موقوف
+                        btn.removeClass('btn-danger').addClass('btn-success');
+                        btn.find('i').removeClass('fa-toggle-off').addClass('fa-toggle-on');
+                        btnText.text('تفعيل الاشتراك');
+
+                        badge.removeClass('bg-success').addClass('bg-danger').text('موقوف');
+                    }
+                } else {
+                    alert('فشل تغيير الحالة');
+                }
+            }).fail(function() {
+                alert('حدث خطأ في الاتصال بالسيرفر');
+            });
+        }
+    </script>
+}

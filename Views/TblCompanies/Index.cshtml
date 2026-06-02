@@ -1,0 +1,125 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblCompany>
+
+@{
+    ViewData["Title"] = "إدارة الشركات";
+}
+
+<!-- رأس الصفحة -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">
+                    <i class="fas fa-city text-primary ms-2"></i> دليل الشركات
+                </h1>
+            </div>
+            <div class="col-sm-6 text-end">
+                <!-- text-end للمحاذاة اليسرى في RTL -->
+                <a asp-action="Create" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-plus ms-1"></i> إضافة شركة جديدة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- محتوى الصفحة -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-outline card-primary shadow-sm">
+                    <div class="card-header">
+                        <h3 class="card-title">قائمة الشركات المسجلة</h3>
+
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control float-right" placeholder="بحث...">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap table-striped">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 25%;">@Html.DisplayNameFor(model => model.Name)</th>
+                                    <th style="width: 15%;">@Html.DisplayNameFor(model => model.Logo)</th>
+                                    <th style="width: 20%;">@Html.DisplayNameFor(model => model.ContactNo)</th>
+                                    <th style="width: 15%;">@Html.DisplayNameFor(model => model.IsActive)</th>
+                                    <th style="width: 20%;" class="text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="align-middle">@item.Id</td>
+                                            <td class="align-middle fw-bold text-primary">
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            <td class="align-middle">
+                                                <!-- عرض الشعار كصورة إذا كان موجوداً، أو نص -->
+                                                @Html.DisplayFor(modelItem => item.Logo)
+                                            </td>
+                                            <td class="align-middle" dir="ltr">
+                                                @Html.DisplayFor(modelItem => item.ContactNo)
+                                            </td>
+                                            <td class="align-middle">
+                                                @if (item.IsActive)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check ms-1"></i> مفعل
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-times ms-1"></i> معطل
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <div class="btn-group btn-group-sm shadow-sm">
+                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="تعديل">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info text-white" title="تفاصيل">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </a>
+                                                    @* <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="حذف" onclick="return confirm('هل أنت متأكد من حذف هذه الشركة؟')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a> *@
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            <i class="fas fa-inbox fa-2x mb-2"></i> <br />
+                                            لا توجد بيانات للعرض
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @* <!-- /.card-body --> *@
+                </div>
+                @* <!-- /.card --> *@
+            </div>
+        </div>
+    </div>
+</section>

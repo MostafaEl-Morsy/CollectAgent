@@ -1,0 +1,156 @@
+﻿@model IEnumerable<DatabaseAccess.Models.TblDepositOrder>
+
+@foreach (var item in Model)
+{
+    var statusClass = "";
+    var statusText = "";
+    var statusIcon = "";
+
+    switch (item.StatusId)
+    {
+        case 1: // Pending
+            statusClass = "status-pending";
+            statusText = "قيد المراجعة";
+            statusIcon = "fas fa-hourglass-half";
+            break;
+        case 2: // Approved
+            statusClass = "status-approved";
+            statusText = "مقبول";
+            statusIcon = "fas fa-check-circle";
+            break;
+        case 3: // Rejected (نفترض أن 3 للمرفوض)
+            statusClass = "status-rejected";
+            statusText = "مرفوض";
+            statusIcon = "fas fa-times-circle";
+            break;
+        default:
+            statusClass = "status-default";
+            statusText = "غير معروف";
+            statusIcon = "fas fa-question-circle";
+            break;
+    }
+
+    <div class="col-md-12">
+        <div class="deposit-card @statusClass">
+            <!-- الجزء العلوي من البطاقة -->
+            <div class="deposit-card-header">
+                <div class="deposit-amount">
+                    <span>@item.DepositAmount.ToString("N0")</span>
+                    <small>ج.م</small>
+                </div>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm">سجل الإيداع</a>
+            </div>
+
+            <!-- الجزء الأوسط من البطاقة - تفاصيل العملية -->
+            <div class="deposit-card-body">
+                <div class="deposit-meta">
+                    <span><i class="fas fa-calendar-alt text-muted"></i> <strong>التاريخ:</strong> @item.Date.ToString("yyyy/MM/dd")</span>
+
+                    @* --- بداية التعديل: عرض المستفيد بناءً على نوع الإيداع --- *@
+                    @if (item.DepositType == 1)
+                    {
+                        @* إيداع لشركة فقط *@
+                        <span><i class="fas fa-building text-muted"></i> <strong>الشركة:</strong> @(item.ProviderIdFkNavigation?.ProviderCode ?? item.ProviderIdFkNavigation?.ProviderName ?? "N/A")</span>
+                    }
+                    else if (item.DepositType == 3)
+                    {
+                        @* إيداع لمستفيد/مستخدم/تاجر فقط *@
+                        <span><i class="fas fa-user-tie text-muted"></i> <strong>المستفيد:</strong> @(item.DepositForNavigation?.UserCode ?? item.DepositForNavigation?.UserCode ?? "N/A")</span>
+                    }
+                    else if (item.DepositType == 2)
+                    {
+                        @* إيداع لشركة ولمستفيد معاً (حسب منطق الكود لديك) *@
+                        <span><i class="fas fa-building text-muted"></i> <strong>الشركة:</strong> @(item.ProviderIdFkNavigation?.ProviderCode ?? "N/A")</span>
+                        <span class="ms-2"><i class="fas fa-user-tie text-muted"></i> <strong>المستفيد:</strong> @(item.DepositForNavigation?.UserCode ?? item.DepositForNavigation?.UserCode ?? "N/A")</span>
+                    }
+                    else
+                    {
+                        @* حالة بديلة إذا لم يكن مسجل النوع بشكل صحيح *@
+                        @if (item.DepositFor != 1 && item.DepositFor != null)
+                        {
+                            <span><i class="fas fa-user-tie text-muted"></i> <strong>المستفيد:</strong> @(item.DepositForNavigation?.UserCode ?? item.DepositForNavigation?.UserCode ?? "N/A")</span>
+                        }
+                        else
+                        {
+                            <span><i class="fas fa-building text-muted"></i> <strong>الشركة:</strong> @(item.ProviderIdFkNavigation?.ProviderCode ?? "N/A")</span>
+                        }
+                    }
+                    @* --- نهاية التعديل --- *@
+                    @* <span><i class="fas fa-info-circle text-muted"></i> <strong>الحالة:</strong> @(item.Status?.StatusName ?? "N/A")</span> *@
+                    <span>
+                        <i class="fas fa-info-circle text-muted"></i> <strong>الحالة:</strong>
+                        <span class="badge rounded-pill @(statusClass)-badge">
+                            <i class="@statusIcon me-1"></i> @statusText
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- الجزء السفلي من البطاقة - الفئات والصورة -->
+            <div class="deposit-card-footer">
+                <div class="denominations">
+                    <small>
+                        <strong>الفئات:</strong>
+                        @if (item.Le500 > 0)
+                        {
+                            <span class="denom-item">500x @item.Le500</span>
+                        }
+                        @if (item.Le200 > 0)
+                        {
+                            <span class="denom-item">200x @item.Le200</span>
+                        }
+                        @if (item.Le100 > 0)
+                        {
+                            <span class="denom-item">100x @item.Le100 </span>
+                        }
+                        @if (item.Le50 > 0)
+                        {
+                            <span class="denom-item">50x @item.Le50 </span>
+                        }
+                        @if (item.Le20 > 0)
+                        {
+                            <span class="denom-item">20x @item.Le20</span>
+                        }
+                        @if (item.Le10 > 0)
+                        {
+                            <span class="denom-item">10x @item.Le10</span>
+                        }
+                        @if (item.Le5 > 0)
+                        {
+                            <span class="denom-item">5x @item.Le5</span>
+                        }
+                    </small>
+                    <div class="mt-2">
+                        <small><strong>المرجع:</strong> @item.ReferenceCode</small>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(item.DepositPhoto))
+                {
+                    <div class="deposit-thumbnail">
+                        <a href="@Url.Content(item.DepositPhoto)" target="_blank">
+                            <img src="@Url.Content(item.DepositPhoto)" alt="صورة الإيداع" />
+                        </a>
+                    </div>
+                }
+            </div>
+            @if (item.StatusId == 1 && ViewBag.currentUserType < 8) // تم التعديل هنا ليظهر فقط في حالة قيد المراجعة
+            {
+                <!-- روابط الإجراءات -->
+                <div class="deposit-card-actions">
+
+                    @* /// --- هذا هو التعديل المطلوب --- /// *@
+                    <form asp-action="DepositConfirm" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من تأكيد هذا الإيداع؟ لا يمكن التراجع عن هذه العملية.');">
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="fas fa-check"></i> موافقة
+                        </button>
+                    </form>
+
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash-alt"></i> رفض
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+}

@@ -1,0 +1,375 @@
+﻿@using System.Security.Claims
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - وكيل مدفوعات</title>
+
+    <!-- Google Font: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css">
+
+    <!-- Your Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+
+    <!-- AdminLTE Style RTL -->
+    <link rel="stylesheet" href="~/lib/adminlte/css/adminlte.rtl.min.css">
+
+    <!-- ✅ الخطوة 1: إضافة CSS الخاص بمكتبة Select2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+
+    <!-- ✅ الخطوة 2: إضافة CSS الخاص بثيم Bootstrap 5 (هذا يحل مشكلة التعارض) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
+
+
+    <style>
+        body, h1, h2, h3, h4, h5, h6, .brand-link, .nav-link, .card, .btn {
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .nav-sidebar .nav-link i.nav-icon {
+            margin-left: .5rem;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<!-- ✅ تم تعديل كلاسات الـ body لتطابق AdminLTE 4 -->
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="app-header navbar navbar-expand bg-body">
+            <div class="container-fluid">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="fas fa-bars"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <a asp-controller="Home" asp-action="Index" class="nav-link">الرئيسية</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <!-- يمكنك إضافة عناصر هنا -->
+                </ul>
+            </div>
+        </nav>
+        <!-- /.navbar -->
+        <!-- ✅ تعديل كامل لهيكل القائمة الجانبية لتطابق AdminLTE 4 -->
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+                <a asp-controller="Home" asp-action="Index" class="brand-link">
+                    <img src="~/lib/adminlte/assets/img/AdminLTELogo.png" alt="Logo" class="brand-image opacity-75 shadow">
+                    <span class="brand-text fw-light">وكـيل مدفوعات</span>
+                </a>
+            </div>
+
+            <!-- ✅ إضافة sidebar-wrapper مهم جداً لعمل القالب -->
+            <div class="sidebar-wrapper">
+                <nav class="mt-2">
+                    <!-- User Panel (اختياري لكن شكله جيد) -->
+                    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                        <div class="image">
+                            <img src="~/lib/adminlte/assets/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+                        </div>
+                        <div class="info">
+                            <a href="#" class="d-block text-white">@(Context.Session.GetString("FullName") ?? "زائر")</a>
+                        </div>
+                    </div>
+
+                    <!-- ✅ تعديل كلاسات و data attribute للقائمة -->
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                                <p>
+                                    الإدارة المالية
+                                    <i class="nav-arrow fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="TblUsers" asp-action="Index" asp-route-mode="oprate" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>تحويل رصيد</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Coll" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>تـحـصـيــل</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblDepositOrders" asp-action="DepositType" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>تـوريــد</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-list-dots"></i>
+                                <p>
+                                    التقارير/جـرد
+                                    <i class="nav-arrow fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="TblBlncTrnsActs" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>التحــويـل</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblDebtTrnsActs" asp-action="CollectTransactIndex" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>التحــصيـل</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblServTrnxes" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>عمليـات المحـافـظ</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblDebtTrnsActs" asp-action="BalanceSheet" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>كشف حساب</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblDepositOrders" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>التـوريــد</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    إدارة التجار
+                                    <i class="nav-arrow fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="TblUsers" asp-action="AddUser" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>إضافة تاجر</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblUsers" asp-action="Index" asp-route-mode="admin" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>بيانات التجار</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-address-card"></i>
+                                <p>
+                                    إدارة الحسابات
+                                    <i class="nav-arrow fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="TblRegistrations" asp-action="Index" class="nav-link">
+                                        @* <a href="@Url.Action("Index", "TblRegistrations")" class="nav-link"> *@
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>حسابات POS</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblServProvRegs" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>محافظ الكاش</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    لوحة التحكم
+                                    <i class="nav-arrow fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="TblDrawers" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>الخزينة / النقدية</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="TblCompanies" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon far fa-circle"></i>
+                                        <p>إدارة شركة الوكيل</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-header">الإعدادات</li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-cog"></i>
+                                <p>إعدادات الحساب</p>
+                            </a>
+                        </li>
+
+                        @{
+                            // This block of code gets the user's role from the security claims.
+                            var roleClaim = User.FindFirst(ClaimTypes.Role);
+                            int userRoleId = 0; // Default to 0 if not found or not a number
+
+                            // Safely try to convert the role value (which is a string) to an integer.
+                            if (roleClaim != null)
+                            {
+                                int.TryParse(roleClaim.Value, out userRoleId);
+                            }
+                        }
+
+                        @* 
+                         This is the corrected condition. 
+                         It checks if the role ID is a number less than 6 (e.g., 1, 2, 3, 4, 5)
+                         OR if the user has the specific role "SuperAdmin".
+                        *@
+                        @if ((userRoleId > 0 && userRoleId < 6) || User.IsInRole("SuperAdmin"))
+                        {
+                            <li class="nav-header">لوحة الإدارة العليا</li>
+                            <li class="nav-item">
+                                <a asp-controller="TblUsers" asp-action="Subscriptions" class="nav-link">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>تشغيل / إيقاف</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="TblAdmins" asp-action="Index" class="nav-link">
+                                    <i class="nav-icon fas fa-user-shield"></i>
+                                    <p>مدراء النظام</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                @* <a asp-controller="TblProviders" asp-action="Index" class="nav-link">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>مزود الخدمة</p>
+                                </a> *@
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        مزود الخدمة
+                                        <i class="nav-arrow fas fa-angle-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a asp-controller="TblProviders" asp-action="Index" class="nav-link">
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>إدارة مزود الخدمة</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a asp-controller="TblServProducts" asp-action="Index" class="nav-link">
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>إدارة منتجات الخدمة</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            @* <a href="#" class="nav-link text-danger"> *@
+                            <a asp-controller="Account" asp-action="Logout" class="nav-link text-danger">
+                                <i class="nav-icon fas fa-sign-out-alt"></i>
+                                <p>تسجيل الخروج</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">@ViewData["Title"]</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="container-fluid">
+                    <!-- هذا السطر يجلب الأرقام الحية من قاعدة البيانات مباشرة -->
+                    <div class="row">
+                        @await Component.InvokeAsync("UserStats")
+                    </div>
+
+                    @* ✅✅✅ أضف هذا الكود هنا ✅✅✅ *@
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @* @TempData["Success"] *@
+                            @Html.Raw(TempData["Success"].ToString())
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <strong>جميع الحقوق محفوظة &copy; @DateTime.Now.Year <a href="#">Mostafa Morsy</a>.</strong>
+            <div class="float-end d-none d-sm-inline-block">
+                <b>Version</b> 1.0.0
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Popper.js is required by Bootstrap 5 -->
+    @* <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> *@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/adminlte/js/adminlte.min.js"></script>
+
+    <!-- DataTables & Plugins -->
+    @* <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> *@
+    @* <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script> *@
+
+    <!-- ✅ الخطوة 3: إضافة JS الخاص بمكتبة Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
