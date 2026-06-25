@@ -56,8 +56,8 @@ else
         string providerName = item.ProvidFkNavigation?.ProviderName ?? "مورد عام";
 
         // المديونية
-        long debtBefore = (isAccidToMe ? item.ColToDbtBfr : item.ColFrmDbtBefr) ?? 0;
-        long debtAfter = (isAccidToMe ? item.ColToDbtAftr : item.ColfrmDebtAfter) ?? 0;
+        long debtBefore = (isAccidToMe ? item.ColFrmDbtBefr : item.ColToDbtBfr) ?? 0;
+        long debtAfter = (isAccidToMe ? item.ColfrmDebtAfter : item.ColToDbtAftr) ?? 0;
 
         // ==========================================
         // 4. تجهيز النصوص والألوان للتصميم

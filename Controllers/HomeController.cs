@@ -1,5 +1,6 @@
 ﻿// Controllers/HomeController.cs
 using CollectAgent.Models;
+using CollectAgent.ViewModels;
 using DatabaseAccess.Models;
 using Microsoft.AspNetCore.Authorization; // <<< أضف هذا
 using Microsoft.AspNetCore.Mvc;
@@ -89,6 +90,32 @@ namespace CollectAgent.Controllers
                 return Forbid(); // أو RedirectToAction لصفحة مخصصة
             }
             return View();
+        }
+
+        public async Task<IActionResult> DashBoard()
+        {
+            var (currentUserId, currentUserType, currentUserCompanyId, currentUserBranchId) = GetCurrentUserInfo();
+            if (currentUserType > 7)
+            {
+                // لا يوجد صلاحية لهذا المستخدم
+                return Forbid(); // أو RedirectToAction لصفحة مخصصة
+            }
+            // جلب بيانات خاصة بالـ Dashboard بناءً على نوع المستخدم
+            var dashboardData = new DashboardViewModel();
+            //if (currentUserType == 1) // مثال: نوع مستخدم معين
+            //{
+            //    dashboardData.SomeData = await _context.SomeEntities
+            //        .Where(e => e.CompanyId == currentUserCompanyId)
+            //        .ToListAsync();
+            //}
+            //else if (currentUserType == 2) // مثال: نوع مستخدم آخر
+            //{
+            //    dashboardData.SomeData = await _context.SomeEntities
+            //        .Where(e => e.BranchId == currentUserBranchId)
+            //        .ToListAsync();
+            //}
+            // يمكنك إضافة المزيد من الشروط بناءً على أنواع المستخدمين الأخرى
+            return View(dashboardData);
         }
 
         // Controllers/HomeController.cs

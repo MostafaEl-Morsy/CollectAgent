@@ -508,6 +508,7 @@ namespace CollectAgent.Controllers
                 try
                 {
                     TblDepositOrder tblDepositOrder = await _context.TblDepositOrders.Where(o => o.UserIdFk == currentUserId && o.StatusId == 1).FirstOrDefaultAsync();
+
                     if (tblDepositOrder == null || tblDepositOrder.StatusId != 1) // تأكد أن الطلب ما زال معلقاً
                     {
                         // إذا لم يتم العثور على الطلب أو تم تأكيده بالفعل، تراجع وأظهر خطأ
@@ -630,7 +631,7 @@ namespace CollectAgent.Controllers
                     {
                         depositToAcc = await _context.TblAccounts.FirstOrDefaultAsync(a => a.UserIdFk == depositFor);
                         dpstFromDbtBfr = depositToAcc.Indebtedness;/////////////////
-                        dpstFromDbtAftr = dpstFromDbtBfr - depositAmount;
+                        dpstFromDbtAftr = dpstFromDbtBfr + depositAmount;
                         depositToAcc.Indebtedness = dpstFromDbtAftr;
                     }
 

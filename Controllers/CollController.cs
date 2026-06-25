@@ -229,9 +229,10 @@ namespace CollectAgent.Controllers
 
                     int cashCollected = collectTransferAction.TotlMoneyTranact;
                     int balanceReturned = collectTransferAction.BlncReturned > 0 ? collectTransferAction.BlncReturned : 0;
-                    int totalCollectedAmount = cashCollected + balanceReturned;
+                    //int totalCollectedAmount = cashCollected;
 
-                    if (totalCollectedAmount <= 0) throw new InvalidOperationException("يجب أن يكون المبلغ المحصل أكبر من الصفر.");
+                    int totalCollcted = cashCollected + balanceReturned;
+                    if (totalCollcted <= 0) throw new InvalidOperationException("يجب أن يكون المبلغ المحصل أكبر من الصفر.");
 
                     // تحديث درج المحصل
                     if (cashCollected > 0)
@@ -332,8 +333,8 @@ namespace CollectAgent.Controllers
 
                     // مديونية المحصل تقل (لأنه حصّل مبلغاً كان مديوناً به النظام له)
                     collectorAccount.Indebtedness += cashCollected; // تصحيح: تزيد (تقترب من الصفر)
-                    // مديونية العميل تقل (لأنه سدد)
-                    debtorAccount.Indebtedness -= totalCollectedAmount;
+                    // مديونية العميل تقل (لأنه سدد نقدا)
+                    debtorAccount.Indebtedness -= cashCollected;
 
                     _context.TblDebtTrnsActs.Add(new TblDebtTrnsAct
                     {
