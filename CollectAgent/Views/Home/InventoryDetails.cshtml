@@ -1,0 +1,140 @@
+﻿@model CollectAgent.Models.UserStatsViewModel
+@{
+    ViewData["Title"] = "المركز المالي التفصيلي";
+}
+
+<div class="container-fluid p-3">
+    <div class="row g-3">
+
+        <!-- ========== صافي المركز المالي (النتيجة النهائية) ========== -->
+        <div class="col-12 mb-4">
+            <div class="card p-4 shadow text-white text-center" style="background-color: #5d3fd3; border-radius: 15px; border: none;">
+                <h4 class="mb-1">صافي المركز المالي للوكيل</h4>
+                <h1 class="fw-bold display-4">@Model.Inventory.ToString("N0")</h1>
+                <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                    <small class="bg-success bg-opacity-25 p-2 rounded">
+                        <i class="fas fa-plus-circle me-1"></i>إجمالي الأصول: @Model.TotalAssets.ToString("N0")
+                    </small>
+                    <small class="bg-danger bg-opacity-25 p-2 rounded">
+                        <i class="fas fa-minus-circle me-1"></i>إجمالي الالتزامات: @Model.TotalLiabilities.ToString("N0")
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== قسم الأصول ========== -->
+        <div class="col-12 mt-0 mb-1">
+            <h5 class="text-secondary border-bottom pb-2">
+                <i class="fas fa-plus-circle text-success me-2"></i>الأصول (مبالغ تُجمع)
+            </h5>
+        </div>
+
+        <!-- النقدية بالخزينة -->
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm text-white h-100" style="background-color: #f39c12; border-radius: 10px;">
+                <p class="mb-1"><i class="fas fa-money-bill-wave me-1"></i>النقدية بالخزينة</p>
+                <h3 class="fw-bold">@Model.Drawer.ToString("N0")</h3>
+            </div>
+        </div>
+
+        <!-- رصيد الأجهزة POS -->
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm text-white h-100" style="background-color: #2ecc71; border-radius: 10px;">
+                <p class="mb-1"><i class="fas fa-cash-register me-1"></i>أرصدة الأجهزة (POS)</p>
+                <h3 class="fw-bold">@Model.Balance.ToString("N0")</h3>
+            </div>
+        </div>
+
+        <!-- محافظ الكاش -->
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm text-white h-100" style="background-color: #00cec9; border-radius: 10px;">
+                <p class="mb-1"><i class="fas fa-wallet me-1"></i>محافظ الكاش</p>
+                <h3 class="fw-bold">@Model.Cash.ToString("N0")</h3>
+            </div>
+        </div>
+
+        <!-- المحافظ البنكية -->
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm text-white h-100" style="background-color: #0984e3; border-radius: 10px;">
+                <p class="mb-1"><i class="fas fa-university me-1"></i>المحافظ البنكية</p>
+                <h3 class="fw-bold">@Model.Bank.ToString("N0")</h3>
+            </div>
+        </div>
+
+        <!-- ديون على التجار (أصول) -->
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm text-white h-100" style="background-color: #00b894; border-radius: 10px;">
+                <p class="mb-1"><i class="fas fa-hand-holding-usd me-1"></i>مبالغ مستحقة من المناديب والتجار</p>
+                <h3 class="fw-bold">@Model.Debtors.ToString("N0")</h3>
+                <small class="opacity-75">مديونية التابعين الموجوبة = أصل للوكيل</small>
+            </div>
+        </div>
+
+        <!-- ========== قسم الالتزامات ========== -->
+        <div class="col-12 mt-4 mb-1">
+            <h5 class="text-secondary border-bottom pb-2">
+                <i class="fas fa-minus-circle text-danger me-2"></i>الالتزامات (مبالغ تُطرح)
+            </h5>
+        </div>
+        <!-- أرصدة مستحقة للتجار -->
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm text-white h-100" style="background-color: #e17055; border-radius: 10px;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="mb-1"><i class="fas fa-user-check me-1"></i>أرصدة مستحقة للمناديب والتجار</p>
+                        <h3 class="fw-bold">@Model.Creditors.ToString("N0")</h3>
+                    </div>
+                    <span class="badge bg-white text-danger fs-6">يُطرح</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ملخص المعادلة ========== -->
+        <div class="col-12 mt-4">
+            <div class="card p-3 shadow-sm bg-light" style="border-radius: 10px;">
+                <h6 class="text-muted mb-2"><i class="fas fa-calculator me-1"></i>تفصيل المعادلة المحاسبية</h6>
+                <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                        <tr class="table-success">
+                            <td>النقدية بالخزينة</td>
+                            <td class="text-end fw-bold">+ @Model.Drawer.ToString("N0")</td>
+                        </tr>
+                        <tr class="table-success">
+                            <td>أرصدة الأجهزة (POS)</td>
+                            <td class="text-end fw-bold">+ @Model.Balance.ToString("N0")</td>
+                        </tr>
+                        <tr class="table-success">
+                            <td>محافظ الكاش</td>
+                            <td class="text-end fw-bold">+ @Model.Cash.ToString("N0")</td>
+                        </tr>
+                        <tr class="table-success">
+                            <td>المحافظ البنكية</td>
+                            <td class="text-end fw-bold">+ @Model.Bank.ToString("N0")</td>
+                        </tr>
+                        <tr class="table-success">
+                            <td>مبالغ مستحقة من التابعين</td>
+                            <td class="text-end fw-bold">+ @Model.Debtors.ToString("N0")</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-success">إجمالي الأصول</td>
+                            <td class="text-end fw-bold text-success">@Model.TotalAssets.ToString("N0")</td>
+                        </tr>
+                        <tr class="table-danger">
+                            <td>أرصدة مستحقة للتابعين</td>
+                            <td class="text-end fw-bold">- @Model.Creditors.ToString("N0")</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-danger">إجمالي الالتزامات</td>
+                            <td class="text-end fw-bold text-danger">@Model.TotalLiabilities.ToString("N0")</td>
+                        </tr>
+                        <tr class="table-primary">
+                            <td class="fw-bold fs-5" style="background-color: #5d3fd3; color: white;">صافي المركز المالي</td>
+                            <td class="text-end fw-bold fs-5" style="background-color: #5d3fd3; color: white;">@Model.Inventory.ToString("N0")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

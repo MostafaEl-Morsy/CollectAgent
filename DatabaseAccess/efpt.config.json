@@ -1,0 +1,166 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "CollectAgentDBContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "MinimumProductVersion": "2.6.0",
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "DatabaseAccess",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[tblAccount]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblAdmin]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblBlncTrnsAct]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblBranch]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblCompany]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDebtTrnsAct]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDepositOrder]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDepositTrnx]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDirction]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDistrict]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDrawer]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblDrwerTransAction]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblGovernate]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblOrder]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblProdCat]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblProdType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblProduct]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblProvider]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblProviderAccOrBank]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblProvType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblRegistration]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblServOrder]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblServProduct]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblServProvReg]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblServTrnx]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblStatus]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblStatusReason]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblTransType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblUser]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblUserType]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}

@@ -1,0 +1,74 @@
+﻿@model CollectAgent.Models.UserStatsViewModel
+
+<div class="d-flex gap-3 align-items-center flex-wrap">
+
+    <!-- النقدية بالخزينة -->
+    <div class="card px-3 py-2 shadow-sm text-white" style="background-color: #f39c12; border-radius: 10px; min-width: 160px;">
+        <small class="opacity-75"><i class="fas fa-money-bill-wave me-1"></i>النقدية</small>
+        <h5 class="fw-bold mb-0">@Model.Drawer.ToString("N0")</h5>
+    </div>
+
+    <!-- أرصدة الحسابات — نفس الكارت القديم المربوط بصفحة الأرصدة -->
+    <a asp-controller="TblRegistrations" asp-action="RegBalance" class="text-decoration-none">
+        <div class="card px-3 py-2 shadow-sm text-white" style="background-color: #2ecc71; border-radius: 10px; min-width: 150px; cursor: pointer; transition: transform 0.2s;"
+             onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <small class="opacity-75"><i class="fas fa-wallet me-1"></i>أرصدة الحسابات</small>
+            <h5 class="fw-bold mb-0">@Model.Balance.ToString("N0")</h5>
+        </div>
+    </a>
+
+    <!-- صافي المركز المالي -->
+    <div class="card px-3 py-2 shadow-sm text-white" style="background-color: #5d3fd3; border-radius: 10px; min-width: 200px;">
+        <small class="opacity-75"><i class="fas fa-chart-pie me-1"></i>صافي المركز المالي</small>
+        <h5 class="fw-bold mb-0">@Model.Inventory.ToString("N0")</h5>
+    </div>
+
+</div>
+
+<!-- صافي رصيد الوكيل (العهدة) -->
+<div class="col-6 col-lg">
+    <a asp-controller="Home" asp-action="InventoryDetails" style="text-decoration:none; color:inherit;">
+        <div class="info-box mb-3 shadow-sm">
+            <span class="info-box-icon bg-custom-purple elevation-1">
+                <i class="fas fa-box"></i>
+            </span>
+            <div class="info-box-content">
+                <span class="info-box-text">صافي رصيد الوكيل</span>
+                @if (Model.Inventory >= 0)
+                {
+                    <span class="info-box-number text-success">@Model.Inventory.ToString("N2")</span>
+                }
+                else
+                {
+                    <span class="info-box-number text-danger">@Model.Inventory.ToString("N2")</span>
+                }
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- المحافظ البنكية -->
+<div class="col-6 col-lg">
+    <div class="info-box mb-3 shadow-sm">
+        <span class="info-box-icon bg-custom-yellow elevation-1">
+            <i class="fas fa-university text-dark"></i>
+        </span>
+        <div class="info-box-content">
+            <span class="info-box-text">المحافظ البنكية</span>
+            <span class="info-box-number">@Model.Bank.ToString("N2")</span>
+        </div>
+    </div>
+</div>
+
+<!-- محافظ الكاش -->
+<div class="col-6 col-lg">
+    <div class="info-box mb-3 shadow-sm">
+        <span class="info-box-icon bg-custom-red elevation-1">
+            <i class="fas fa-cash-register"></i>
+        </span>
+        <div class="info-box-content">
+            <span class="info-box-text">محافظ الكاش</span>
+            <span class="info-box-number">@Model.Cash.ToString("N2")</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+D:\MyProjects\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.deps.json
+D:\MyProjects\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.runtimeconfig.json
+D:\MyProjects\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.dll
+D:\MyProjects\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.pdb
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.csproj.AssemblyReference.cache
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.GeneratedMSBuildEditorConfig.editorconfig
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.AssemblyInfoInputs.cache
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.AssemblyInfo.cs
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.csproj.CoreCompileInputs.cache
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.dll
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\refint\DatabaseAccess.dll
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.pdb
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.genruntimeconfig.cache
+D:\MyProjects\CollectAgent\DatabaseAccess\obj\Debug\net9.0\ref\DatabaseAccess.dll
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.deps.json
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.runtimeconfig.json
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.dll
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.pdb
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.csproj.AssemblyReference.cache
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.AssemblyInfoInputs.cache
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.AssemblyInfo.cs
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.csproj.CoreCompileInputs.cache
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.dll
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\refint\DatabaseAccess.dll
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.pdb
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.genruntimeconfig.cache
+C:\Source\Visualstudio\CollectAgent\DatabaseAccess\obj\Debug\net9.0\ref\DatabaseAccess.dll
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.deps.json
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.runtimeconfig.json
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.dll
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\bin\Debug\net9.0\DatabaseAccess.pdb
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.csproj.AssemblyReference.cache
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.AssemblyInfoInputs.cache
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.AssemblyInfo.cs
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.csproj.CoreCompileInputs.cache
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.sourcelink.json
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.dll
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\refint\DatabaseAccess.dll
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.pdb
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\DatabaseAccess.genruntimeconfig.cache
+C:\Users\Mo Almorsy\source\repos\MostafaEl-Morsy\CollectAgent\DatabaseAccess\obj\Debug\net9.0\ref\DatabaseAccess.dll
